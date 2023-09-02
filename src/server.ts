@@ -1,9 +1,16 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+import app from "./app";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // prisma query will be here
+
+  const port = 5000
+
+  app.listen(port, () =>
+    console.log(`🚀 Server ready at Port: ${port} ⭐️`)
+  );
+  
 }
 
 main()
