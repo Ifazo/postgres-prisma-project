@@ -1,12 +1,22 @@
 import { Router } from "express";
-import { UserRoutes } from "../modules/user/user.routes";
+import { userRoutes } from "../modules/user/user.routes";
+import { categoryRoutes } from "../modules/category/category.routes";
+import { bookRoutes } from "../modules/book/book.routes";
 
 const router = Router();
 
 const routes = [
   {
     path: "/users",
-    route: UserRoutes,
+    route: userRoutes,
+  },
+  {
+    path: "/categories",
+    route: categoryRoutes,
+  },
+  {
+    path: "/books",
+    route: bookRoutes,
   },
 ];
 

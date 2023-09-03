@@ -1,8 +1,8 @@
-import { Router } from 'express'
-import { UserController } from './user.controller'
+import { Router } from "express";
+import { userController } from "./user.controller";
 
-const router = Router()
+const router = Router();
 
-router.post("/", UserController.postUser).get('/', UserController.getUser)
+router.post("/", userController.postUser).get("/", userController.getUser);
 
-export const UserRoutes = router
+export const userRoutes = router;

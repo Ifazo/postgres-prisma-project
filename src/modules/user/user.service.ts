@@ -16,7 +16,7 @@ const getUser = async () => {
   };
 };
 
-export const UserService = {
+export const userService = {
   postUser,
   getUser,
 };

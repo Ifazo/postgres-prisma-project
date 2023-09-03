@@ -4,13 +4,13 @@ import app from "./app";
 const prisma = new PrismaClient();
 
 async function main() {
-
-  const port = 5000
-
-  app.listen(port, () =>
-    console.log(`🚀 Server ready at Port: ${port} ⭐️`)
-  );
   
+  app.get("/", (req, res) => {
+    res.send("Hello Prisma World!");
+  });
+  
+  const port = 5000;
+  app.listen(port, () => console.log(`🚀 Server ready at Port: ${port} ⭐️`));
 }
 
 main()
