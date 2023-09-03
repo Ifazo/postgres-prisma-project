@@ -20,6 +20,7 @@ model User {
   address         String
   profileImg      String
   reviewAndRating ReviewAndRating[]
+  Order           Order[]
 }
 
 model Category {
@@ -48,4 +49,21 @@ model ReviewAndRating {
   userId String
   book   Book   @relation(fields: [bookId], references: [id])
   bookId String
+}
+
+model OrderedBook {
+  id       String @id @default(uuid())
+  bookId   String
+  quantity Int
+  orderId  String
+  order    Order  @relation(fields: [orderId], references: [id])
+}
+
+model Order {
+  id           String        @id @default(uuid())
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  status       String        @default("pending")
+  createdAt    DateTime      @default(now())
+  OrderedBook  OrderedBook[]
 }
