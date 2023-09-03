@@ -2,21 +2,33 @@ import { NextFunction, Request, Response } from "express";
 import { UserService } from "./user.service";
 import sendResponse from "../../shared/sendResponse";
 import { User } from "@prisma/client";
+import catchAsync from "../../shared/catchAsync";
 
 const postUser = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const result = await UserService.postUser(req.body)
-        sendResponse<User>(res, {
-          success: true,
-          statusCode: 200,
-          message: "User created successfully",
-          data: result,
-        });
-    } catch (error) {
-        next(error)
-    }
-}
+  try {
+    const result = await UserService.postUser(req.body);
+    sendResponse<User>(res, {
+      success: true,
+      statusCode: 200,
+      message: "User created successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getUser();
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "User created successfully",
+    data: result,
+  });
+});
 
 export const UserController = {
-    postUser
-}
+  postUser,
+  getUser,
+};

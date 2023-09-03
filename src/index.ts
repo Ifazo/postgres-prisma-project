@@ -9,32 +9,32 @@
 // app.use(express.json());
 
 // // Create a new user
-// // app.post("/users", async (req, res) => {
-// //   const { name, email, password, role, contactNo, address, profileImg } =
-// //     req.body;
-// //   try {
-// //     const newUser = await prisma.user.create({
-// //       data: {
-// //         name,
-// //         email,
-// //         password,
-// //         role,
-// //         contactNo,
-// //         address,
-// //         profileImg,
-// //       },
-// //     });
-// //     sendResponse(res, {
-// //       success: true,
-// //       statusCode: 200,
-// //       message: "User post successfully",
-// //       data: newUser,
-// //     });
-// //   } catch (error) {
-// //     // res.status(500).json({ error: "Unable to create user" });
-// //     res.send(error)
-// //   }
-// // });
+// app.post("/users", async (req, res) => {
+//   const { name, email, password, role, contactNo, address, profileImg } =
+//     req.body;
+//   try {
+//     const newUser = await prisma.user.create({
+//       data: {
+//         name,
+//         email,
+//         password,
+//         role,
+//         contactNo,
+//         address,
+//         profileImg,
+//       },
+//     });
+//     sendResponse(res, {
+//       success: true,
+//       statusCode: 200,
+//       message: "User post successfully",
+//       data: newUser,
+//     });
+//   } catch (error) {
+//     // res.status(500).json({ error: "Unable to create user" });
+//     res.send(error)
+//   }
+// });
 
 // // Get all users
 // app.get("/users", async (req, res) => {
