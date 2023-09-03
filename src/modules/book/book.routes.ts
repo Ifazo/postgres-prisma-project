@@ -1,8 +1,8 @@
-// import { Router } from "express";
-// import { bookController } from "./book.controller";
+import { Router } from "express";
+import { bookController } from "./book.controller";
 
-// const router = Router()
+const router = Router()
 
-// router.post('/', bookController.postBook).get('/', bookController.getBook)
+router.post('/', bookController.postBook).get('/', bookController.getBook)
 
-// export const bookRoutes = router
+export const bookRoutes = router

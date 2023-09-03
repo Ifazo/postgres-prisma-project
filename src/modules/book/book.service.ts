@@ -1,22 +1,22 @@
-// import { Book, PrismaClient } from "@prisma/client";
+import { Book, PrismaClient } from "@prisma/client";
 
-// const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 
-// const postBook = async (data: Book): Promise<Book> => {
-//   const result = await prisma.book.create({
-//     data,
-//   });
-//   return result;
-// };
+const postBook = async (data: Book): Promise<Book> => {
+  const result = await prisma.book.create({
+    data,
+  });
+  return result;
+};
 
-// const getBook = async () => {
-//   const result = await prisma.book.findMany();
-//   return {
-//     data: result,
-//   };
-// };
+const getBook = async () => {
+  const result = await prisma.book.findMany();
+  return {
+    data: result,
+  };
+};
 
-// export const bookService = {
-//   postBook,
-//   getBook,
-// };
+export const bookService = {
+  postBook,
+  getBook,
+};
