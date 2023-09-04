@@ -9,7 +9,7 @@ const postOrder = catchAsync(async (req: Request, res: Response) => {
   sendResponse<Order>(res, {
     success: true,
     statusCode: 200,
-    message: "Book created successfully",
+    message: "Order created successfully",
     data: result,
   });
 });
@@ -19,7 +19,18 @@ const getOrder = catchAsync(async (_req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: 200,
-    message: "Book get successfully",
+    message: "Orders get successfully",
+    data: result,
+  });
+});
+
+const getOrderById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await orderService.getOrderById(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Order get successfully",
     data: result,
   });
 });
@@ -27,4 +38,5 @@ const getOrder = catchAsync(async (_req: Request, res: Response) => {
 export const orderController = {
   postOrder,
   getOrder,
+  getOrderById,
 };

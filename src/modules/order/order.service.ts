@@ -16,7 +16,17 @@ const getOrder = async () => {
   };
 };
 
+const getOrderById = async (id: string): Promise<Order | null> => {
+  const result = await prisma.order.findUnique({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const orderService = {
   postOrder,
   getOrder,
+  getOrderById
 };
