@@ -26,12 +26,23 @@ const getUserById = catchAsync(async (req: Request, res: Response) => {
 
 const updateUserById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const data = req.body
+  const data = req.body;
   const user = await userService.updateUserById(id, data);
   sendResponse(res, {
     success: true,
     statusCode: 200,
-    message: "User update successfully",
+    message: "User updated successfully",
+    data: user,
+  });
+});
+
+const deleteUserById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await userService.deleteUserById(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "User deleted successfully",
     data: user,
   });
 });
@@ -39,5 +50,6 @@ const updateUserById = catchAsync(async (req: Request, res: Response) => {
 export const userController = {
   getUsers,
   getUserById,
-  updateUserById
+  updateUserById,
+  deleteUserById,
 };
