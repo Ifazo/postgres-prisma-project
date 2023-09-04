@@ -5,6 +5,7 @@ const router = Router();
 
 router
   .post("/", categoryController.postCategory)
-  .get("/", categoryController.getCategory);
+  .get("/", categoryController.getCategory)
+  .get("/:id", categoryController.getCategoryById);
 
 export const categoryRoutes = router;

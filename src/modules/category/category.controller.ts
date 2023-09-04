@@ -19,12 +19,24 @@ const getCategory = catchAsync(async (_req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: 200,
-    message: "Category get successfully",
+    message: "Categories get successfully",
     data: result,
+  });
+});
+
+const getCategoryById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await categoryService.getCategoryById(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Category get successfully",
+    data: user,
   });
 });
 
 export const categoryController = {
   postCategory,
   getCategory,
+  getCategoryById,
 };

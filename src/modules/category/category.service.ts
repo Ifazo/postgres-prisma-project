@@ -16,7 +16,17 @@ const getCategory = async () => {
   };
 };
 
+const getCategoryById = async (id: string): Promise<Category | null> => {
+  const result = await prisma.category.findUnique({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const categoryService = {
   postCategory,
   getCategory,
+  getCategoryById
 };
