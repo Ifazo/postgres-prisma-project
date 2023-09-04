@@ -26,35 +26,35 @@ const getCategory = catchAsync(async (_req: Request, res: Response) => {
 
 const getCategoryById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = await categoryService.getCategoryById(id);
+  const result = await categoryService.getCategoryById(id);
   sendResponse(res, {
     success: true,
     statusCode: 200,
     message: "Category get successfully",
-    data: user,
+    data: result,
   });
 });
 
 const updateCategoryById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = req.body;
-  const user = await categoryService.updateCategoryById(id, data);
+  const result = await categoryService.updateCategoryById(id, data);
   sendResponse(res, {
     success: true,
     statusCode: 200,
     message: "Category updated successfully",
-    data: user,
+    data: result,
   });
 });
 
 const deleteCategoryById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = await categoryService.deleteCategoryById(id);
+  const result = await categoryService.deleteCategoryById(id);
   sendResponse(res, {
     success: true,
     statusCode: 200,
     message: "Category deleted successfully",
-    data: user,
+    data: result,
   });
 });
 

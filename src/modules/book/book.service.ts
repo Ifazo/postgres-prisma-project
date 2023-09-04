@@ -16,7 +16,36 @@ const getBook = async () => {
   };
 };
 
+const getBookById = async (id: string): Promise<Book | null> => {
+  const result = await prisma.book.findUnique({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
+const updateBookById = async (id: string, data: any): Promise<Book | null> => {
+  const result = await prisma.book.update({
+    where: { id },
+    data,
+  });
+  return result;
+};
+
+const deleteBookById = async (id: string): Promise<Book | null> => {
+  const result = await prisma.book.delete({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const bookService = {
   postBook,
   getBook,
+  getBookById,
+  updateBookById,
+  deleteBookById,
 };
