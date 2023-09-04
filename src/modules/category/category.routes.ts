@@ -6,6 +6,8 @@ const router = Router();
 router
   .post("/", categoryController.postCategory)
   .get("/", categoryController.getCategory)
-  .get("/:id", categoryController.getCategoryById);
+  .get("/:id", categoryController.getCategoryById)
+  .patch("/:id", categoryController.updateCategoryById)
+  .delete("/:id", categoryController.deleteCategoryById);
 
 export const categoryRoutes = router;

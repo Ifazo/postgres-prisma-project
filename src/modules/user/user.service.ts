@@ -20,7 +20,7 @@ const getUserById = async (id: string): Promise<User | null> => {
 
 const updateUserById = async (
   id: string,
-  data: Prisma.UserUpdateInput
+  data: any
 ): Promise<User | null> => {
   const result = await prisma.user.update({
     where: { id },

@@ -35,8 +35,33 @@ const getCategoryById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateCategoryById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const data = req.body;
+  const user = await categoryService.updateCategoryById(id, data);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Category updated successfully",
+    data: user,
+  });
+});
+
+const deleteCategoryById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await categoryService.deleteCategoryById(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Category deleted successfully",
+    data: user,
+  });
+});
+
 export const categoryController = {
   postCategory,
   getCategory,
   getCategoryById,
+  updateCategoryById,
+  deleteCategoryById,
 };

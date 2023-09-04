@@ -25,8 +25,30 @@ const getCategoryById = async (id: string): Promise<Category | null> => {
   return result;
 };
 
+const updateCategoryById = async (
+  id: string,
+  data: any
+): Promise<Category | null> => {
+  const result = await prisma.category.update({
+    where: { id },
+    data,
+  });
+  return result;
+};
+
+const deleteCategoryById = async (id: string): Promise<Category | null> => {
+  const result = await prisma.category.delete({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const categoryService = {
   postCategory,
   getCategory,
-  getCategoryById
+  getCategoryById,
+  updateCategoryById,
+  deleteCategoryById,
 };
