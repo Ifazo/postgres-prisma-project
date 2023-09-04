@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync";
 import { authService } from "./auth.service";
 import sendResponse from "../../shared/sendResponse";
-import { PrismaClient, User } from "@prisma/client";
+import { User } from "@prisma/client";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.createUser(req.body);
@@ -15,11 +15,11 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await authService.loginUser(req.body);
-  sendResponse(res, {
+  const result = await authService.loginUser(req.body, res);
+  sendResponse<string>(res, {
     success: true,
     statusCode: 200,
-    message: "User log-in successfully",
+    message: "User sign-in successfully",
     data: result,
   });
 });

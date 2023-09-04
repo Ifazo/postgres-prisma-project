@@ -1,12 +1,9 @@
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
-const createToken = (
-  payload: Record<string, unknown>,
-  secret: Secret,
-  expireTime: string
-): string => {
+const createToken = (payload: Record<string, unknown>): string => {
+  const secret = "ziaulkarimifaz-secret-key";
   return jwt.sign(payload, secret, {
-    expiresIn: expireTime,
+    expiresIn: "24h",
   });
 };
 

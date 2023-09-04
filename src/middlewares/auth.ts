@@ -8,17 +8,18 @@ const auth =
     try {
       //get authorization token
       const token = req.headers.authorization;
+      // verify token
       if (!token) {
         res.status(401).json({ success: false, message: "Invalid token" });
       }
-      // verify token
-      let verifiedUser = null;
 
-      verifiedUser = jwtHelpers.verifyToken(token!, process.env.jwt_secret_key as Secret);
+      let verified = null;
 
-      req.body = verifiedUser;
+      verified = jwtHelpers.verifyToken(token!, process.env.jwt_secret_key as Secret);
 
-      if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
+      req.body = verified;
+
+      if (requiredRoles.length && !requiredRoles.includes(verified.role)) {
         res.status(401).json({ success: false, message: "Invalid user" });
       }
       next();
