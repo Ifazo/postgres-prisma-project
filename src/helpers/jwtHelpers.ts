@@ -2,9 +2,7 @@ import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
 const createToken = (payload: Record<string, unknown>): string => {
   const secret = "ziaulkarimifaz-secret-key";
-  return jwt.sign(payload, secret, {
-    expiresIn: "24h",
-  });
+  return jwt.sign(payload, secret);
 };
 
 const verifyToken = (token: string, secret: Secret): JwtPayload => {
