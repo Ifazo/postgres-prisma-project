@@ -1,4 +1,4 @@
-import { PrismaClient, User } from "@prisma/client";
+import { Prisma, PrismaClient, User } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -18,7 +18,19 @@ const getUserById = async (id: string): Promise<User | null> => {
   return user;
 };
 
+const updateUserById = async (
+  id: string,
+  data: Prisma.UserUpdateInput
+): Promise<User | null> => {
+  const result = await prisma.user.update({
+    where: { id },
+    data,
+  });
+  return result;
+};
+
 export const userService = {
   getUsers,
   getUserById,
+  updateUserById,
 };
