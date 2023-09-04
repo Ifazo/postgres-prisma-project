@@ -6,7 +6,7 @@ import { USER_ROLE } from "../../enums";
 const router = Router();
 
 router
-  .post("/signup", auth(USER_ROLE.USER), authController.createUser)
-  .post("/signin", auth(USER_ROLE.USER), authController.loginUser);
+  .post("/signup", authController.createUser)
+  .post("/signin", authController.loginUser);
 
 export const authRoutes = router;
