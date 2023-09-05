@@ -1,7 +1,6 @@
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
-const createToken = (payload: string | object | Buffer): string => {
-  const secret = "ziaulkarimifaz-secret-key";
+const createToken = (payload: object, secret: Secret): string => {
   return jwt.sign(payload, secret);
 };
 

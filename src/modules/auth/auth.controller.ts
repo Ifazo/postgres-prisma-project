@@ -16,7 +16,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.loginUser(req.body, res);
-  sendResponse<string>(res, {
+  sendResponse<User>(res, {
     success: true,
     statusCode: 200,
     message: "User sign-in successfully",

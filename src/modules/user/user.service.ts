@@ -20,8 +20,8 @@ const getUserById = async (id: string): Promise<User | null> => {
 
 const updateUserById = async (
   id: string,
-  data: any
-): Promise<User | null> => {
+  data: User
+): Promise<User> => {
   const result = await prisma.user.update({
     where: { id },
     data,
@@ -29,7 +29,7 @@ const updateUserById = async (
   return result;
 };
 
-const deleteUserById = async (id: string): Promise<User | null> => {
+const deleteUserById = async (id: string): Promise<User> => {
   const user = await prisma.user.delete({
     where: {
       id,
@@ -42,5 +42,5 @@ export const userService = {
   getUsers,
   getUserById,
   updateUserById,
-  deleteUserById
+  deleteUserById,
 };

@@ -6,18 +6,10 @@ import { ENUM_USER_ROLE } from "../../enums";
 const router = Router();
 
 router
-  .post("/", auth(ENUM_USER_ROLE.ADMIN), categoryController.postCategory)
+  .post("/", categoryController.postCategory)
   .get("/", categoryController.getCategory)
   .get("/:id", categoryController.getCategoryById)
-  .patch(
-    "/:id",
-    auth(ENUM_USER_ROLE.ADMIN),
-    categoryController.updateCategoryById
-  )
-  .delete(
-    "/:id",
-    auth(ENUM_USER_ROLE.ADMIN),
-    categoryController.deleteCategoryById
-  );
+  .patch("/:id", categoryController.updateCategoryById)
+  .delete("/:id", categoryController.deleteCategoryById);
 
 export const categoryRoutes = router;

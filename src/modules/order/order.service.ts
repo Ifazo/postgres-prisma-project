@@ -1,4 +1,4 @@
-import { Order, PrismaClient } from "@prisma/client";
+import { Order, OrderedBook, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 

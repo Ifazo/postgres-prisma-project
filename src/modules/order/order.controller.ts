@@ -1,4 +1,4 @@
-import { Order } from "@prisma/client";
+import { Order, OrderedBook } from "@prisma/client";
 import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
 import { orderService } from "./order.service";
