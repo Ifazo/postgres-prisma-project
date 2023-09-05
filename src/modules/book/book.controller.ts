@@ -3,6 +3,7 @@ import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
 import { bookService } from "./book.service";
 import { Request, Response } from "express";
+import pick from "../../shared/pick";
 
 const postBook = catchAsync(async (req: Request, res: Response) => {
   const result = await bookService.postBook(req.body);
@@ -14,13 +15,25 @@ const postBook = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getBook = catchAsync(async (_req: Request, res: Response) => {
-  const result = await bookService.getBook();
+const bookOptionsFields: string[] = ["page", "size", "sortBy", "sortOrder"];
+const bookFilterableFields: string[] = [
+  "searchTerm",
+  "title",
+  "author",
+  "genre",
+];
+
+const getBook = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, bookFilterableFields);
+  const options = pick(req.query, bookOptionsFields);
+
+  const result = await bookService.getBook(filters, options);
   sendResponse(res, {
     success: true,
     statusCode: 200,
-    message: "Books get successfully",
-    data: result,
+    message: "Books by search & filters get successfully",
+    meta: result.meta,
+    data: result.data,
   });
 });
 

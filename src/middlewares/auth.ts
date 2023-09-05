@@ -15,7 +15,10 @@ const auth =
 
       let verified = null;
 
-      verified = jwtHelpers.verifyToken(token!, process.env.jwt_secret_key as Secret);
+      verified = jwtHelpers.verifyToken(
+        token!,
+        process.env.jwt_secret_key as Secret
+      );
 
       req.body = verified;
 

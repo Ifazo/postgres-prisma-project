@@ -20,7 +20,6 @@ const loginUser = async (data: User, res: Response): Promise<string> => {
   const tokenPayload = {
     role: result?.role,
     id: result?.id,
-    iat: Math.floor(Date.now() / 1000) - 3600 * 24 * 365,
   };
 
   const token = jwtHelpers.createToken(tokenPayload);
