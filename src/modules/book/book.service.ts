@@ -75,6 +75,15 @@ const getBook = async (
   };
 };
 
+const getBookByCategoryId = async (categoryId: string): Promise<Book[] | null> => {
+  const result = await prisma.book.findMany({
+    where: {
+      categoryId,
+    },
+  });
+  return result;
+};
+
 const getBookById = async (id: string): Promise<Book | null> => {
   const result = await prisma.book.findUnique({
     where: {
@@ -104,6 +113,7 @@ const deleteBookById = async (id: string): Promise<Book | null> => {
 export const bookService = {
   postBook,
   getBook,
+  getBookByCategoryId,
   getBookById,
   updateBookById,
   deleteBookById,

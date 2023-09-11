@@ -10,7 +10,7 @@ const router = Router();
 
 const routes = [
   {
-    path: "/auth",
+    path: "/",
     route: authRoutes,
   },
   {

@@ -7,7 +7,7 @@ const router = Router();
 
 router
   .post("/create-order", auth(USER_ROLE.CUSTOMER), orderController.postOrder)
-  .get("/", orderController.getOrder)
+  .get("/", auth(USER_ROLE.ADMIN), orderController.getOrder)
   .get("/:id", orderController.getOrderById);
 
 export const orderRoutes = router;

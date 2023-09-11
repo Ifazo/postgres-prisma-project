@@ -1,4 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
+import { Request } from "express";
 
 const prisma = new PrismaClient();
 
@@ -17,7 +18,16 @@ const loginUser = async (data: User): Promise<User> => {
   return result!;
 };
 
+const profile = async (req: Request): Promise<User> => {
+  const id = req.body.userId;
+  const result = await prisma.user.findUnique({
+    where: { id },
+  });
+  return result!;
+};
+
 export const authService = {
   createUser,
   loginUser,
+  profile,
 };
