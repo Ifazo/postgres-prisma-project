@@ -4,7 +4,7 @@ import { orderController } from "./order.controller";
 const router = Router();
 
 router
-  .post("/", orderController.postOrder)
+  .post("/create-order", orderController.postOrder)
   .get("/", orderController.getOrder)
   .get("/:id", orderController.getOrderById);
 

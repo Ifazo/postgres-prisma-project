@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
-export enum ENUM_USER_ROLE {
-  SUPER_ADMIN = "ifaz",
+export enum USER_ROLE {
   ADMIN = "admin",
   USER = "user",
+  CUSTOMER = "customer",
 }

@@ -1,30 +1,35 @@
 import { NextFunction, Request, Response } from "express";
-import { Secret } from "jsonwebtoken";
-import { jwtHelpers } from "../helpers/jwtHelpers";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import config from "../config";
 
 const auth =
   (...requiredRoles: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // const token = req.cookies.token;
       const token = req.headers.authorization;
-      
+
       if (!token) {
-        res.status(401).json({ success: false, message: "Ypu are not authorized" });
+        return res
+          .status(401)
+          .json({ success: false, message: "Ypu are not authorized" });
       }
 
       let verified = null;
 
-      verified = jwtHelpers.verifyToken(
-        token!,
+      verified = jwt.verify(
+        token,
         config.jwt_secret_key as Secret
-      );
+      ) as JwtPayload;
 
       req.body = verified;
 
       if (requiredRoles.length && !requiredRoles.includes(verified.role)) {
-        res.status(401).json({ success: false, message: "Forbidden user" });
+        return res
+          .status(401)
+          .json({ success: false, message: "Forbidden user" });
       }
+
       next();
     } catch (error) {
       next(error);

@@ -11,23 +11,15 @@ datasource db {
 }
 
 enum Role {
-  admin
-  user
-  customer
+  ADMIN
+  USER
+  CUSTOMER
 }
 
 enum Status {
-  pending
-  shipped
-  delivered
-}
-
-model Auth {
-  id     String @id @default(uuid())
-  role   Role   @default(user)
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-  iat    Int
+  PENDING
+  SHIPPED
+  DELIVERED
 }
 
 model User {
@@ -39,17 +31,20 @@ model User {
   contactNo       String
   address         String
   profileImg      String
-  ReviewAndRating ReviewAndRating[]
-  Order           Order[]
-  Auth            Auth[]
+  createdAt       DateTime?         @default(now())
+  updatedAt       DateTime?         @updatedAt()
+  reviewAndRating ReviewAndRating[]
+  order           Order[]
 
   @@map("user")
 }
 
 model Category {
-  id    String @id @default(uuid())
-  title String
-  book  Book[]
+  id        String    @id @default(uuid())
+  title     String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  book      Book[]
 
   @@map("category")
 }
@@ -61,42 +56,37 @@ model Book {
   price           Float
   genre           String
   publicationDate DateTime
-  category        Category          @relation(fields: [categoryId], references: [id])
   categoryId      String
-  ReviewAndRating ReviewAndRating[]
-  OrderedBook     OrderedBook[]
+  category        Category          @relation(fields: [categoryId], references: [id])
+  createdAt       DateTime?         @default(now())
+  updatedAt       DateTime?         @updatedAt
+  reviewAndRating ReviewAndRating[]
 
   @@map("book")
 }
 
 model ReviewAndRating {
-  id     String @id @default(uuid())
-  review String
-  rating Int
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-  book   Book   @relation(fields: [bookId], references: [id])
-  bookId String
+  id        String    @id @default(uuid())
+  review    String
+  rating    Int
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  bookId    String
+  book      Book      @relation(fields: [bookId], references: [id])
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 
   @@map("reviewAndRating")
 }
 
 model Order {
-  id          String        @id @default(uuid())
-  user        User          @relation(fields: [userId], references: [id])
+  id          String    @id @default(uuid())
   userId      String
-  status      Status        @default(pending)
-  createdAt   DateTime      @default(now())
-  OrderedBook OrderedBook[]
+  user        User      @relation(fields: [userId], references: [id])
+  status      Status    @default(PENDING)
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  orderedBook Json[]    @default([])
 
   @@map("order")
-}
-
-model OrderedBook {
-  id       String @id @default(uuid())
-  book     Book   @relation(fields: [bookId], references: [id])
-  bookId   String
-  quantity Int
-  order    Order  @relation(fields: [orderId], references: [id])
-  orderId  String
 }

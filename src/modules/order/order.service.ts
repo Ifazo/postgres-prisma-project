@@ -1,8 +1,8 @@
-import { Order, OrderedBook, PrismaClient } from "@prisma/client";
+import { Order, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const postOrder = async (data: Order): Promise<Order> => {
+const postOrder = async (data: any): Promise<Order> => {
   const result = await prisma.order.create({
     data,
   });
@@ -28,5 +28,5 @@ const getOrderById = async (id: string): Promise<Order | null> => {
 export const orderService = {
   postOrder,
   getOrder,
-  getOrderById
+  getOrderById,
 };
