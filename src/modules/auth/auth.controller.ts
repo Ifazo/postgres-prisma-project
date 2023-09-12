@@ -10,8 +10,8 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.createUser(req.body);
 
   const tokenPayload = {
-    userId: result.id,
-    role: result.role,
+    userId: result?.id,
+    role: result?.role,
   };
 
   const secret = config.jwt_secret_key as Secret;
@@ -35,13 +35,13 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.loginUser(req.body);
 
   const tokenPayload = {
-    userId: result.id,
-    role: result.role,
+    userId: result?.id,
+    role: result?.role,
   };
 
   const secret = config.jwt_secret_key as Secret;
   const token = jwt.sign(tokenPayload, secret, { expiresIn: "24h" });
-
+  
   res.cookie("token", token, {
     httpOnly: true,
     secure: config.node_env === "production",
@@ -57,8 +57,10 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const profile = catchAsync(async (req: Request, res: Response) => {
-  const result = await authService.profile(req.body);
-
+  const userId = req.headers?.userId as string;
+  console.log(userId)
+  const result = await authService.profile(userId);
+  console.log(result)
   sendResponse<User>(res, {
     success: true,
     statusCode: 200,

@@ -4,7 +4,6 @@ import config from "../config";
 
 const auth = (...roles: string[]) => async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // const token = req.cookies.token;
     const token = req.headers.authorization;
 
     if (!token) {
@@ -13,18 +12,18 @@ const auth = (...roles: string[]) => async (req: Request, res: Response, next: N
         .json({ success: false, message: "You are unauthorized" });
     }
 
-    const decodedToken = jwt.verify(
+    let verifiedToken = jwt.verify(
       token,
       config.jwt_secret_key as Secret
     ) as JwtPayload;
 
-    if (roles.length && !roles.includes(decodedToken.role)) {
+    if (roles.length && !roles.includes(verifiedToken.role)) {
       return res
         .status(401)
         .json({ success: false, message: "Forbidden user" });
     }
 
-    req.body = decodedToken;
+    req.headers = verifiedToken;
 
     next();
   } catch (error) {
