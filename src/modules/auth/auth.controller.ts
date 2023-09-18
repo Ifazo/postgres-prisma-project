@@ -23,6 +23,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
   };
   const secret = config.jwt_secret_key as Secret;
   const token = jwt.sign(payload, secret);
+  req.headers.authorization = token;
   setCookie(res, token);
 
   sendResponse<User>(res, {
@@ -41,8 +42,9 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   };
   const secret = config.jwt_secret_key as Secret;
   const token = jwt.sign(payload, secret);
+  req.headers.authorization = token;
   setCookie(res, token);
-
+  
   return res.json(<ILoginResponse>{
     success: true,
     statusCode: 200,
