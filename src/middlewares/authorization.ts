@@ -1,44 +1,39 @@
-// import { NextFunction, Request, Response } from "express";
-// import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-// import config from "../config";
+import { NextFunction, Request, Response } from "express";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import config from "../config";
 
-// interface DecodedToken extends JwtPayload {
-//   userId: string;
-//   role: string;
-// }
+const authorization = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "You are unauthorized" });
+    }
 
-// const authorization = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const token = req.cookies.token;
+    const verifiedToken = jwt.verify(
+      token,
+      config.jwt_secret_key as Secret
+      ) as JwtPayload;
+      
+      const { userId } = verifiedToken;
 
-//   if (!token) {
-//     return res
-//       .status(401)
-//       .json({ success: false, message: "Unauthorized user" });
-//   }
+    if (verifiedToken.userId !== userId) {
+      return res
+        .status(401)
+        .json({ success: false, message: "You are forbidden user" });
+    }
 
-//   try {
-//     const decodedToken: DecodedToken = jwt.verify(
-//       token,
-//       config.jwt_secret_key as Secret
-//     );
+    // req.headers = verifiedToken;
 
-//     if (decodedToken.role !== req.body.role) {
-//       return res
-//         .status(403)
-//         .json({ success: false, message: "Forbidden. Access denied." });
-//     }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
 
-//     req.body.userId = decodedToken.userId;
-//     req.body.role = decodedToken.role;
-
-//     next();
-//   } catch (error) {
-//     return res.status(401).json({ success: false, message: "Unauthorized" });
-//   }
-// };
-
-// export default authorization;
+export default authorization;

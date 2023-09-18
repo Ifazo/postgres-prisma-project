@@ -5,23 +5,18 @@ import sendResponse from "../../shared/sendResponse";
 import { User } from "@prisma/client";
 import config from "../../config";
 import jwt, { Secret } from "jsonwebtoken";
+import { ILoginResponse, IUser } from "../../interface";
 
-const createUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await authService.createUser(req.body);
-
-  const tokenPayload = {
-    userId: result?.id,
-    role: result?.role,
-  };
-
-  const secret = config.jwt_secret_key as Secret;
-  const token = jwt.sign(tokenPayload, secret, { expiresIn: "24h" });
-
+const setCookie = (res: Response, token: string) => {
   res.cookie("token", token, {
     httpOnly: true,
     secure: config.node_env === "production",
     maxAge: 1000 * 60 * 60 * 24 * 7,
   });
+};
+
+const createUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await authService.createUser(req.body);
 
   sendResponse<User>(res, {
     success: true,
@@ -34,34 +29,26 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.loginUser(req.body);
 
-  const tokenPayload = {
-    userId: result?.id,
-    role: result?.role,
-  };
-
   const secret = config.jwt_secret_key as Secret;
-  const token = jwt.sign(tokenPayload, secret, { expiresIn: "24h" });
-  
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: config.node_env === "production",
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-  });
+  const token = jwt.sign(result, secret);
+  setCookie(res, token);
 
-  sendResponse<User>(res, {
+  return res.json(<ILoginResponse>{
     success: true,
     statusCode: 200,
     message: "User sign-in successfully",
-    data: result,
+    token: token,
   });
 });
 
 const profile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.headers?.userId as string;
-  console.log(userId)
-  const result = await authService.profile(userId);
-  console.log(result)
-  sendResponse<User>(res, {
+  const token = req.headers.authorization;
+  const secret = config.jwt_secret_key as Secret;
+  const decodedToken = jwt.verify(token as string, secret) as User;
+  const {id} = decodedToken;
+  const result = await authService.profile(id as string);
+  
+  return res.json(<IUser>{
     success: true,
     statusCode: 200,
     message: "User profile",

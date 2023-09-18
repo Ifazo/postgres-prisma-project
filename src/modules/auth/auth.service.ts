@@ -13,18 +13,22 @@ const createUser = async (data: User): Promise<User> => {
   return result;
 };
 
-const loginUser = async (data: User): Promise<User | null> => {
+const loginUser = async (data: User): Promise<User> => {
   const { email } = data;
-  const result = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email },
   });
-  return result;
+  if (!user) {
+    throw new Error("User not found");
+  }
+  
+  return user;
 };
 
-const profile = async (userId: string): Promise<User | null> => {
+const profile = async (id: string): Promise<User | null> => {
   try {
     const result = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id },
     });
 
     return result;

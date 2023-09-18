@@ -18,10 +18,7 @@ const getUserById = async (id: string): Promise<User | null> => {
   return user;
 };
 
-const updateUserById = async (
-  id: string,
-  data: User
-): Promise<User> => {
+const updateUserById = async (id: string, data: User): Promise<User> => {
   const result = await prisma.user.update({
     where: { id },
     data,
