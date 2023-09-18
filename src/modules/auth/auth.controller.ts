@@ -5,7 +5,7 @@ import sendResponse from "../../shared/sendResponse";
 import { User } from "@prisma/client";
 import config from "../../config";
 import jwt, { Secret } from "jsonwebtoken";
-import { ILoginResponse, IUser } from "../../interface";
+import { IAuth, ILoginResponse, IUser } from "../../interface";
 
 const setCookie = (res: Response, token: string) => {
   res.cookie("token", token, {
@@ -17,6 +17,13 @@ const setCookie = (res: Response, token: string) => {
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.createUser(req.body);
+  const payload: IAuth = {
+    id: result.id,
+    role: result.role,
+  };
+  const secret = config.jwt_secret_key as Secret;
+  const token = jwt.sign(payload, secret);
+  setCookie(res, token);
 
   sendResponse<User>(res, {
     success: true,
@@ -28,9 +35,12 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.loginUser(req.body);
-
+  const payload: IAuth = {
+    id: result.id,
+    role: result.role,
+  };
   const secret = config.jwt_secret_key as Secret;
-  const token = jwt.sign(result, secret);
+  const token = jwt.sign(payload, secret);
   setCookie(res, token);
 
   return res.json(<ILoginResponse>{
@@ -45,9 +55,9 @@ const profile = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization as string;
   const secret = config.jwt_secret_key as Secret;
   const decodedToken = jwt.verify(token, secret) as User;
-  const {id} = decodedToken;
+  const { id } = decodedToken;
   const result = await authService.profile(id as string);
-  
+
   return res.json(<IUser>{
     success: true,
     statusCode: 200,

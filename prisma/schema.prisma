@@ -12,7 +12,6 @@ datasource db {
 
 enum Role {
   ADMIN
-  USER
   CUSTOMER
 }
 
@@ -23,18 +22,18 @@ enum Status {
 }
 
 model User {
-  id              String            @id @default(uuid())
-  name            String
-  email           String            @unique
-  password        String
-  role            String
-  contactNo       String
-  address         String
-  profileImg      String
-  createdAt       DateTime?         @default(now())
-  updatedAt       DateTime?         @updatedAt()
-  reviewAndRating ReviewAndRating[]
-  order           Order[]
+  id               String            @id @default(uuid())
+  name             String
+  email            String            @unique
+  password         String
+  role             String
+  contactNo        String
+  address          String
+  profileImg       String
+  createdAt        DateTime?         @default(now())
+  updatedAt        DateTime?         @updatedAt()
+  reviewAndRatings ReviewAndRating[]
+  orders           Order[]
 
   @@map("user")
 }
@@ -44,24 +43,23 @@ model Category {
   title     String
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
-  book      Book[]
+  books     Book[]
 
   @@map("category")
 }
 
 model Book {
-  id              String            @id @default(uuid())
-  title           String
-  author          String
-  price           Float
-  genre           String
-  publicationDate DateTime
-  categoryId      String
-  category        Category          @relation(fields: [categoryId], references: [id])
-  createdAt       DateTime?         @default(now())
-  updatedAt       DateTime?         @updatedAt
-  reviewAndRating ReviewAndRating[]
-  orderedBook     OrderedBook[]
+  id               String            @id @default(uuid())
+  title            String
+  author           String
+  price            Float
+  genre            String
+  publicationDate  DateTime
+  categoryId       String
+  category         Category          @relation(fields: [categoryId], references: [id])
+  createdAt        DateTime?         @default(now())
+  updatedAt        DateTime?         @updatedAt
+  reviewAndRatings ReviewAndRating[]
 
   @@map("book")
 }
@@ -81,26 +79,13 @@ model ReviewAndRating {
 }
 
 model Order {
-  id          String        @id @default(uuid())
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
-  status      Status        @default(PENDING)
-  createdAt   DateTime?     @default(now())
-  updatedAt   DateTime?     @updatedAt
-  orderedBook OrderedBook[]
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  status       Status    @default(PENDING)
+  createdAt    DateTime? @default(now())
+  updatedAt    DateTime? @updatedAt
+  orderedBooks Json[]
 
   @@map("order")
-}
-
-model OrderedBook {
-  id        String    @id @default(uuid())
-  orderId   String
-  order     Order     @relation(fields: [orderId], references: [id])
-  bookId    String
-  book      Book      @relation(fields: [bookId], references: [id])
-  quantity  Int
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-
-  @@map("orderedBook")
 }

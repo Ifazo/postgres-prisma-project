@@ -2,12 +2,20 @@ import { Order, PrismaClient } from "@prisma/client";
 import { Request } from "express";
 import config from "../../config";
 import jwt, { Secret } from "jsonwebtoken";
+import { IOrderedBook } from "../../interface";
 
 const prisma = new PrismaClient();
 
-const postOrder = async (data: Order): Promise<Order> => {
+const postOrder = async (data: Order[], req: Request): Promise<Order> => {
+  const token = req.headers.authorization as string;
+  const secret = config.jwt_secret_key as Secret;
+  const decodedToken = jwt.verify(token, secret) as Order;
+  const { id } = decodedToken;
   const result = await prisma.order.create({
-    data,
+    data: {
+      ...data,
+      userId: id,
+    },
   });
   return result;
 };
@@ -16,16 +24,11 @@ const getOrder = async (req: Request) => {
   const token = req.headers.authorization as string;
   const secret = config.jwt_secret_key as Secret;
   const decodedToken = jwt.verify(token, secret) as Order;
-  console.log(decodedToken);
   const { id } = decodedToken;
-  const findUser = await prisma.user.findUnique({
-    where: {
-      id,
-    },
-  });
+
   const result = await prisma.order.findMany({
     where: {
-      userId: findUser?.id,
+      userId: id,
     },
   });
   return {

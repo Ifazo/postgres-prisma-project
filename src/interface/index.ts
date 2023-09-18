@@ -15,6 +15,18 @@ export type ILoginResponse = {
   token: string;
 };
 
+export type IAuth = {
+  id: string;
+  role: string;
+};
+
+export type IOrderedBook = {
+  id: string;
+  bookId: string;
+  orderId: string;
+  quantity: number;
+}
+
 export type IUser = {
   success: boolean;
   statusCode: number;

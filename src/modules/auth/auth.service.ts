@@ -21,7 +21,6 @@ const loginUser = async (data: User): Promise<User> => {
   if (!user) {
     throw new Error("User not found");
   }
-  
   return user;
 };
 
@@ -30,7 +29,6 @@ const profile = async (id: string): Promise<User | null> => {
     const result = await prisma.user.findUnique({
       where: { id },
     });
-
     return result;
   } catch (error) {
     console.error(error);
