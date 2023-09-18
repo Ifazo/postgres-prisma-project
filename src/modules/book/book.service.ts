@@ -23,10 +23,7 @@ const getBook = async (
   const { searchTerm, ...filterData } = filters;
   console.log(filterData);
   const andConditions = [];
-
-  
   const bookSearchableFields: string[] = [ "title", "author", "genre" ];
-  
   if (searchTerm) {
     andConditions.push({
       OR: bookSearchableFields.map((field) => ({
@@ -37,7 +34,6 @@ const getBook = async (
       })),
     });
   }
-
   if (Object.keys(filterData).length > 0) {
     andConditions.push({
       AND: Object.keys(filterData).map((key) => ({
@@ -47,10 +43,8 @@ const getBook = async (
       })),
     });
   }
-
   const whereConditions: Prisma.BookWhereInput =
     andConditions.length > 0 ? { AND: andConditions } : {};
-
   const result = await prisma.book.findMany({
     where: whereConditions,
     skip,
@@ -60,10 +54,9 @@ const getBook = async (
         ? { [options.sortBy]: options.sortOrder }
         : { title: "asc" },
   });
-
   const total = await prisma.book.count();
   const totalPage = Math.ceil(total / size);
-
+  
   return {
     meta: {
       page,

@@ -3,8 +3,15 @@ import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
 import { orderService } from "./order.service";
 import { Request, Response } from "express";
+import config from "../../config";
+import jwt, { Secret } from "jsonwebtoken";
 
-const postOrder = catchAsync(async (req: Request, res: Response) => {
+const postOrder = async (req: Request, res: Response) => {
+  const token = req.headers.authorization as string;
+  const secret = config.jwt_secret_key as Secret;
+  const decodedToken = jwt.verify(token, secret) as Order;
+  console.log(decodedToken)
+  const { id } = decodedToken;
   const result = await orderService.postOrder(req.body);
   sendResponse<Order>(res, {
     success: true,
@@ -12,10 +19,10 @@ const postOrder = catchAsync(async (req: Request, res: Response) => {
     message: "Order created successfully",
     data: result,
   });
-});
+};
 
-const getOrder = catchAsync(async (_req: Request, res: Response) => {
-  const result = await orderService.getOrder();
+const getOrder = catchAsync(async (req: Request, res: Response) => {
+  const result = await orderService.getOrder(req);
   sendResponse(res, {
     success: true,
     statusCode: 200,

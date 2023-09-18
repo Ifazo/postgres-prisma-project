@@ -42,9 +42,9 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const profile = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization;
+  const token = req.headers.authorization as string;
   const secret = config.jwt_secret_key as Secret;
-  const decodedToken = jwt.verify(token as string, secret) as User;
+  const decodedToken = jwt.verify(token, secret) as User;
   const {id} = decodedToken;
   const result = await authService.profile(id as string);
   
