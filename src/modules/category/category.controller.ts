@@ -1,62 +1,79 @@
 import { Request, Response } from "express";
-import catchAsync from "../../shared/catchAsync";
-import { categoryService } from "./category.service";
-import sendResponse from "../../shared/sendResponse";
-import { Category } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
-const postCategory = catchAsync(async (req: Request, res: Response) => {
-  const result = await categoryService.postCategory(req.body);
-  sendResponse<Category>(res, {
+const prisma = new PrismaClient();
+
+const postCategory = async (req: Request, res: Response) => {
+  const result = await prisma.category.create({
+    data: req.body,
+  });
+
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Category created successfully",
     data: result,
   });
-});
+};
 
-const getCategory = catchAsync(async (_req: Request, res: Response) => {
-  const result = await categoryService.getCategory();
-  sendResponse(res, {
+const getCategory = async (_req: Request, res: Response) => {
+  const result = await prisma.category.findMany();
+
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Categories get successfully",
     data: result,
   });
-});
+};
 
-const getCategoryById = catchAsync(async (req: Request, res: Response) => {
+const getCategoryById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await categoryService.getCategoryById(id);
-  sendResponse(res, {
+  const result = await prisma.category.findUnique({
+    where: {
+      id,
+    },
+  });
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Category get successfully",
     data: result,
   });
-});
+};
 
-const updateCategoryById = catchAsync(async (req: Request, res: Response) => {
+const updateCategoryById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const data = req.body;
-  const result = await categoryService.updateCategoryById(id, data);
-  sendResponse(res, {
+
+  const result = await prisma.category.update({
+    where: { id },
+    data: req.body,
+  });
+
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Category updated successfully",
     data: result,
   });
-});
+};
 
-const deleteCategoryById = catchAsync(async (req: Request, res: Response) => {
+const deleteCategoryById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await categoryService.deleteCategoryById(id);
-  sendResponse(res, {
+  
+  const result = await prisma.category.delete({
+    where: {
+      id,
+    },
+  });
+
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Category deleted successfully",
     data: result,
   });
-});
+};
 
 export const categoryController = {
   postCategory,

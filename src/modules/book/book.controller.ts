@@ -1,86 +1,148 @@
-import { Book } from "@prisma/client";
-import catchAsync from "../../shared/catchAsync";
-import sendResponse from "../../shared/sendResponse";
-import { bookService } from "./book.service";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { paginationHelpers } from "../../helpers/paginationHelpers";
+import { IBookFilterRequest, IPaginationOptions } from "../../interface";
 import pick from "../../shared/pick";
 
-const postBook = catchAsync(async (req: Request, res: Response) => {
-  const result = await bookService.postBook(req.body);
-  sendResponse<Book>(res, {
+const prisma = new PrismaClient();
+
+const bookOptionsFields: string[] = ["page", "size", "sortBy", "sortOrder", "minPrice", "maxPrice"];
+const bookFilterableFields: string[] = ["search", "title", "author", "genre"];
+
+const postBook = async (req: Request, res: Response) => {
+  const book = await prisma.book.create({
+    data: req.body,
+  });
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Book created successfully",
-    data: result,
+    data: book,
   });
-});
+};
 
-const bookOptionsFields: string[] = ["page", "size", "sortBy", "sortOrder"];
-const bookFilterableFields: string[] = [
-  "searchTerm",
-  "title",
-  "author",
-  "genre",
-];
+const getBook = async (req: Request, res: Response) => {
+  const filters = pick(req.query, bookFilterableFields) as IBookFilterRequest;
+  const options = pick(req.query, bookOptionsFields) as IPaginationOptions;
+  const { page, size, skip, sortBy, sortOrder, minPrice, maxPrice } =
+    paginationHelpers.calculatePagination(options);
+  const { search, ...filterData } = filters;
 
-const getBook = catchAsync(async (req: Request, res: Response) => {
-  const filters = pick(req.query, bookFilterableFields);
-  const options = pick(req.query, bookOptionsFields);
-
-  const result = await bookService.getBook(filters, options);
-  sendResponse(res, {
+  const andConditions = [];
+  const bookSearchableFields: string[] = ["title", "author", "genre"];
+  if (search) {
+    andConditions.push({
+      OR: bookSearchableFields.map((field) => ({
+        [field]: {
+          contains: search,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+  const whereConditions: Prisma.BookWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+  const books = await prisma.book.findMany({
+    where: whereConditions,
+    skip,
+    take: size,
+    orderBy:
+      sortBy && sortOrder
+        ? { [sortBy]: sortOrder }
+        : { title: "asc" },
+  });
+  // const minPrice = await prisma.book.aggregate({
+  //   _min: {
+  //     price: true,
+  //   },
+  //   _max: {
+  //     price: true,
+  //   },
+  // });
+  const total = await prisma.book.count();
+  const totalPage = Math.ceil(total / size);
+  const meta = { page, size, total, totalPage };
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Books by search & filters get successfully",
-    meta: result.meta,
-    data: result.data,
+    meta: meta,
+    data: books,
   });
-});
+};
 
-const getBookByCategoryId = catchAsync(async (req: Request, res: Response) => {
+const getBookByCategoryId = async (req: Request, res: Response) => {
   const { categoryId } = req.params;
-  const result = await bookService.getBookByCategoryId(categoryId);
-  sendResponse(res, {
+  const books = await prisma.book.findMany({
+    where: {
+      categoryId,
+    },
+  });
+
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Books with associated category data fetched successfully",
-    data: result,
+    data: books,
   });
-});
+};
 
-const getBookById = catchAsync(async (req: Request, res: Response) => {
+const getBookById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await bookService.getBookById(id);
-  sendResponse(res, {
+  const book = await prisma.book.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Book get successfully",
-    data: result,
+    data: book,
   });
-});
+};
 
-const updateBookById = catchAsync(async (req: Request, res: Response) => {
+const updateBookById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = req.body;
-  const result = await bookService.updateBookById(id, data);
-  sendResponse(res, {
+  const result = await prisma.book.update({
+    where: { id },
+    data,
+  });
+
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Book updated successfully",
     data: result,
   });
-});
+};
 
-const deleteBookById = catchAsync(async (req: Request, res: Response) => {
+const deleteBookById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await bookService.deleteBookById(id);
-  sendResponse(res, {
+  const result = await prisma.book.delete({
+    where: {
+      id,
+    },
+  });
+
+  return res.json({
     success: true,
     statusCode: 200,
     message: "Book deleted successfully",
     data: result,
   });
-});
+};
 
 export const bookController = {
   postBook,

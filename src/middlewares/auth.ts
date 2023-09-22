@@ -5,7 +5,7 @@ import config from "../config";
 declare global {
   namespace Express {
     interface Request {
-      user?: JwtPayload; // Assuming JwtPayload is the type for your decoded JWT
+      user?: JwtPayload;
     }
   }
 }

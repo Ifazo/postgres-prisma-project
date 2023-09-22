@@ -1,72 +1,81 @@
 import { Request, Response } from "express";
-import catchAsync from "../../shared/catchAsync";
-import { authService } from "./auth.service";
-import sendResponse from "../../shared/sendResponse";
-import { User } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import config from "../../config";
 import jwt, { Secret } from "jsonwebtoken";
 import { IAuth, ILoginResponse, IUser } from "../../interface";
 
-const setCookie = (res: Response, token: string) => {
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: config.node_env === "production",
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-  });
-};
+const prisma = new PrismaClient();
 
-const createUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await authService.createUser(req.body);
+const createUser = async (req: Request, res: Response) => {
+  const user = await prisma.user.create({
+    data: req.body,
+  });
   const payload: IAuth = {
-    id: result.id,
-    role: result.role,
+    id: user.id,
+    role: user.role,
   };
   const secret = config.jwt_secret_key as Secret;
   const token = jwt.sign(payload, secret);
   req.headers.authorization = token;
-  setCookie(res, token);
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
 
-  sendResponse<User>(res, {
+  return res.json({
     success: true,
     statusCode: 200,
     message: "User created successfully",
-    data: result,
+    data: user,
   });
-});
+};
 
-const loginUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await authService.loginUser(req.body);
+const loginUser = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (!user) {
+    throw new Error("User not found");
+  }
   const payload: IAuth = {
-    id: result.id,
-    role: result.role,
+    id: user.id,
+    role: user.role,
   };
   const secret = config.jwt_secret_key as Secret;
   const token = jwt.sign(payload, secret);
   req.headers.authorization = token;
-  setCookie(res, token);
-  
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+
   return res.json(<ILoginResponse>{
     success: true,
     statusCode: 200,
     message: "User sign-in successfully",
     token: token,
   });
-});
+};
 
-const profile = catchAsync(async (req: Request, res: Response) => {
+const profile = async (req: Request, res: Response) => {
   const token = req.headers.authorization as string;
   const secret = config.jwt_secret_key as Secret;
   const decodedToken = jwt.verify(token, secret) as User;
   const { id } = decodedToken;
-  const result = await authService.profile(id as string);
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
 
-  return res.json(<IUser>{
+  return res.json({
     success: true,
     statusCode: 200,
     message: "User profile",
-    data: result,
+    data: user,
   });
-});
+};
 
 export const authController = {
   createUser,

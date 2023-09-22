@@ -25,24 +25,26 @@ export type IOrderedBook = {
   bookId: string;
   orderId: string;
   quantity: number;
-}
+};
 
-export type IUser = {
+export type IPromise = {
   success: boolean;
   statusCode: number;
   message: string;
-  data: {
-    id: string;
-    name: string;
-    email: string;
-    password: string;
-    role: string;
-    contactNo: string;
-    address: string;
-    profileImg: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
+  data: object;
+};
+
+export type IUser = {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+  contactNo: string;
+  address: string;
+  profileImg: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type IPaginationOptions = {
@@ -53,5 +55,5 @@ export type IPaginationOptions = {
 };
 
 export type IBookFilterRequest = {
-  searchTerm?: string;
+  search?: string;
 };
