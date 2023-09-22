@@ -13,7 +13,7 @@ const postBook = async (req: Request, res: Response) => {
   const book = await prisma.book.create({
     data: req.body,
   });
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Book created successfully",
@@ -60,18 +60,11 @@ const getBook = async (req: Request, res: Response) => {
         ? { [sortBy]: sortOrder }
         : { title: "asc" },
   });
-  // const minPrice = await prisma.book.aggregate({
-  //   _min: {
-  //     price: true,
-  //   },
-  //   _max: {
-  //     price: true,
-  //   },
-  // });
+  
   const total = await prisma.book.count();
   const totalPage = Math.ceil(total / size);
   const meta = { page, size, total, totalPage };
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Books by search & filters get successfully",
@@ -88,7 +81,7 @@ const getBookByCategoryId = async (req: Request, res: Response) => {
     },
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Books with associated category data fetched successfully",
@@ -104,7 +97,7 @@ const getBookById = async (req: Request, res: Response) => {
     },
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Book get successfully",
@@ -120,7 +113,7 @@ const updateBookById = async (req: Request, res: Response) => {
     data,
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Book updated successfully",
@@ -136,7 +129,7 @@ const deleteBookById = async (req: Request, res: Response) => {
     },
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Book deleted successfully",

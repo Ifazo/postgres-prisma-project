@@ -8,7 +8,7 @@ const postCategory = async (req: Request, res: Response) => {
     data: req.body,
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Category created successfully",
@@ -19,7 +19,7 @@ const postCategory = async (req: Request, res: Response) => {
 const getCategory = async (_req: Request, res: Response) => {
   const result = await prisma.category.findMany();
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Categories get successfully",
@@ -34,7 +34,7 @@ const getCategoryById = async (req: Request, res: Response) => {
       id,
     },
   });
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Category get successfully",
@@ -50,7 +50,7 @@ const updateCategoryById = async (req: Request, res: Response) => {
     data: req.body,
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Category updated successfully",
@@ -67,7 +67,7 @@ const deleteCategoryById = async (req: Request, res: Response) => {
     },
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Category deleted successfully",

@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const getUsers = async (_req: Request, res: Response) => {
   const result = await prisma.user.findMany();
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Users get successfully",
@@ -22,7 +22,7 @@ const getUserById = async (req: Request, res: Response) => {
     },
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "User get successfully",
@@ -38,7 +38,7 @@ const updateUserById = async (req: Request, res: Response) => {
     data,
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "User updated successfully",
@@ -54,7 +54,7 @@ const deleteUserById = async (req: Request, res: Response) => {
     },
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "User deleted successfully",

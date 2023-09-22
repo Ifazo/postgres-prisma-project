@@ -8,7 +8,7 @@ const postReview = async (req: Request, res: Response) => {
     data: req.body,
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Review created successfully",
@@ -19,7 +19,7 @@ const postReview = async (req: Request, res: Response) => {
 const getReview = async (_req: Request, res: Response) => {
   const result = await prisma.reviewAndRating.findMany();
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Review get successfully",

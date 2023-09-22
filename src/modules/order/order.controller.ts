@@ -18,7 +18,7 @@ const postOrder = async (req: Request, res: Response) => {
     },
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Order created successfully",
@@ -28,6 +28,13 @@ const postOrder = async (req: Request, res: Response) => {
 
 const getOrder = async (req: Request, res: Response) => {
   const token = req.headers.authorization as string;
+  if (!token) {
+    return res.send({
+      success: false,
+      statusCode: 401,
+      message: "Unauthorized",
+    });
+  }
   const secret = config.jwt_secret_key as Secret;
   const decodedToken = jwt.verify(token, secret) as Order;
   const { id } = decodedToken;
@@ -37,7 +44,7 @@ const getOrder = async (req: Request, res: Response) => {
     },
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Orders get successfully",
@@ -53,7 +60,7 @@ const getOrderById = async (req: Request, res: Response) => {
     },
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "Order get successfully",

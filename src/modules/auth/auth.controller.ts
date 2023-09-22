@@ -23,7 +23,7 @@ const createUser = async (req: Request, res: Response) => {
     sameSite: "none",
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "User created successfully",
@@ -52,7 +52,7 @@ const loginUser = async (req: Request, res: Response) => {
     sameSite: "none",
   });
 
-  return res.json(<ILoginResponse>{
+  return res.send(<ILoginResponse>{
     success: true,
     statusCode: 200,
     message: "User sign-in successfully",
@@ -69,7 +69,7 @@ const profile = async (req: Request, res: Response) => {
     where: { id },
   });
 
-  return res.json({
+  return res.send({
     success: true,
     statusCode: 200,
     message: "User profile",
