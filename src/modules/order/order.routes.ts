@@ -7,7 +7,11 @@ const router = Router();
 
 router
   .post("/create-order", auth(USER_ROLE.CUSTOMER), orderController.postOrder)
-  .get("/", auth(USER_ROLE.ADMIN, USER_ROLE.CUSTOMER), orderController.getOrder)
-  .get("/:id",auth(USER_ROLE.ADMIN), orderController.getOrderById);
+  .get(
+    "/",
+    auth(USER_ROLE.ADMIN, USER_ROLE.CUSTOMER),
+    orderController.getOrders
+  )
+  .get("/:id", auth(USER_ROLE.ADMIN, USER_ROLE.CUSTOMER), orderController.getOrderById);
 
 export const orderRoutes = router;

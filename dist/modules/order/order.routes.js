@@ -11,6 +11,6 @@ const enums_1 = require("../../enums");
 const router = (0, express_1.Router)();
 router
     .post("/create-order", (0, auth_1.default)(enums_1.USER_ROLE.CUSTOMER), order_controller_1.orderController.postOrder)
-    .get("/", (0, auth_1.default)(enums_1.USER_ROLE.ADMIN), order_controller_1.orderController.getOrder)
-    .get("/:id", order_controller_1.orderController.getOrderById);
+    .get("/", (0, auth_1.default)(enums_1.USER_ROLE.ADMIN, enums_1.USER_ROLE.CUSTOMER), order_controller_1.orderController.getOrders)
+    .get("/:id", (0, auth_1.default)(enums_1.USER_ROLE.ADMIN, enums_1.USER_ROLE.CUSTOMER), order_controller_1.orderController.getOrderById);
 exports.orderRoutes = router;

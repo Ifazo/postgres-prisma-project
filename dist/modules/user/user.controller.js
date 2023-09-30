@@ -8,54 +8,61 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userController = void 0;
-const user_service_1 = require("./user.service");
-const sendResponse_1 = __importDefault(require("../../shared/sendResponse"));
-const catchAsync_1 = __importDefault(require("../../shared/catchAsync"));
-const getUsers = (0, catchAsync_1.default)((_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.userService.getUsers();
-    (0, sendResponse_1.default)(res, {
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
+const getUsers = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma.user.findMany();
+    return res.send({
         success: true,
         statusCode: 200,
         message: "Users get successfully",
         data: result,
     });
-}));
-const getUserById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield user_service_1.userService.getUserById(id);
-    (0, sendResponse_1.default)(res, {
+    const result = yield prisma.user.findUnique({
+        where: {
+            id,
+        },
+    });
+    return res.send({
         success: true,
         statusCode: 200,
         message: "User get successfully",
         data: result,
     });
-}));
-const updateUserById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+const updateUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const data = req.body;
-    const result = yield user_service_1.userService.updateUserById(id, data);
-    (0, sendResponse_1.default)(res, {
+    const result = yield prisma.user.update({
+        where: { id },
+        data,
+    });
+    return res.send({
         success: true,
         statusCode: 200,
         message: "User updated successfully",
         data: result,
     });
-}));
-const deleteUserById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+const deleteUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield user_service_1.userService.deleteUserById(id);
-    (0, sendResponse_1.default)(res, {
+    const result = yield prisma.user.delete({
+        where: {
+            id,
+        },
+    });
+    return res.send({
         success: true,
         statusCode: 200,
         message: "User deleted successfully",
         data: result,
     });
-}));
+});
 exports.userController = {
     getUsers,
     getUserById,

@@ -8,32 +8,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reviewController = void 0;
-const catchAsync_1 = __importDefault(require("../../shared/catchAsync"));
-const sendResponse_1 = __importDefault(require("../../shared/sendResponse"));
-const review_service_1 = require("./review.service");
-const postReview = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield review_service_1.reviewService.postReview(req.body);
-    (0, sendResponse_1.default)(res, {
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
+const postReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma.reviewAndRating.create({
+        data: req.body,
+    });
+    return res.send({
         success: true,
         statusCode: 200,
         message: "Review created successfully",
         data: result,
     });
-}));
-const getReview = (0, catchAsync_1.default)((_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield review_service_1.reviewService.getReview();
-    (0, sendResponse_1.default)(res, {
+});
+const getReview = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma.reviewAndRating.findMany();
+    return res.send({
         success: true,
         statusCode: 200,
         message: "Review get successfully",
         data: result,
     });
-}));
+});
 exports.reviewController = {
     postReview,
     getReview,

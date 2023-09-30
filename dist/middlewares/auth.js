@@ -22,13 +22,13 @@ const auth = (...roles) => (req, res, next) => __awaiter(void 0, void 0, void 0,
                 .status(401)
                 .json({ success: false, message: "You are unauthorized" });
         }
-        let verifiedToken = jsonwebtoken_1.default.verify(token, config_1.default.jwt_secret_key);
-        if (roles.length && !roles.includes(verifiedToken.role)) {
+        const verifiedUser = jsonwebtoken_1.default.verify(token, config_1.default.jwt_secret_key);
+        req.user = verifiedUser;
+        if (roles.length && !roles.includes(verifiedUser.role)) {
             return res
                 .status(401)
                 .json({ success: false, message: "Forbidden user" });
         }
-        req.headers = verifiedToken;
         next();
     }
     catch (error) {

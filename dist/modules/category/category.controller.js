@@ -8,63 +8,71 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.categoryController = void 0;
-const catchAsync_1 = __importDefault(require("../../shared/catchAsync"));
-const category_service_1 = require("./category.service");
-const sendResponse_1 = __importDefault(require("../../shared/sendResponse"));
-const postCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield category_service_1.categoryService.postCategory(req.body);
-    (0, sendResponse_1.default)(res, {
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
+const postCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma.category.create({
+        data: req.body,
+    });
+    return res.send({
         success: true,
         statusCode: 200,
         message: "Category created successfully",
         data: result,
     });
-}));
-const getCategory = (0, catchAsync_1.default)((_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield category_service_1.categoryService.getCategory();
-    (0, sendResponse_1.default)(res, {
+});
+const getCategory = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma.category.findMany();
+    return res.send({
         success: true,
         statusCode: 200,
         message: "Categories get successfully",
         data: result,
     });
-}));
-const getCategoryById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+const getCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield category_service_1.categoryService.getCategoryById(id);
-    (0, sendResponse_1.default)(res, {
+    const result = yield prisma.category.findUnique({
+        where: {
+            id,
+        },
+    });
+    return res.send({
         success: true,
         statusCode: 200,
         message: "Category get successfully",
         data: result,
     });
-}));
-const updateCategoryById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+const updateCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const data = req.body;
-    const result = yield category_service_1.categoryService.updateCategoryById(id, data);
-    (0, sendResponse_1.default)(res, {
+    const result = yield prisma.category.update({
+        where: { id },
+        data: req.body,
+    });
+    return res.send({
         success: true,
         statusCode: 200,
         message: "Category updated successfully",
         data: result,
     });
-}));
-const deleteCategoryById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+const deleteCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield category_service_1.categoryService.deleteCategoryById(id);
-    (0, sendResponse_1.default)(res, {
+    const result = yield prisma.category.delete({
+        where: {
+            id,
+        },
+    });
+    return res.send({
         success: true,
         statusCode: 200,
         message: "Category deleted successfully",
         data: result,
     });
-}));
+});
 exports.categoryController = {
     postCategory,
     getCategory,
