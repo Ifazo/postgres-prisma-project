@@ -1,17 +1,14 @@
 import { Router } from "express";
 import { orderController } from "./order.controller";
 import auth from "../../middlewares/auth";
-import { USER_ROLE } from "../../enums";
+import { Role } from "@prisma/client";
 
 const router = Router();
 
 router
-  .post("/create-order", auth(USER_ROLE.CUSTOMER), orderController.postOrder)
-  .get(
-    "/",
-    auth(USER_ROLE.ADMIN, USER_ROLE.CUSTOMER),
-    orderController.getOrders
-  )
-  .get("/:id", auth(USER_ROLE.ADMIN, USER_ROLE.CUSTOMER), orderController.getOrderById);
+  .post("/", auth(Role.user), orderController.postOrder)
+  .get("/", auth(Role.user, Role.admin), orderController.getOrders)
+  .get("/:id", auth(Role.user, Role.admin), orderController.getOrderById)
+  .delete("/:id", auth(Role.user, Role.admin), orderController.deleteOrderById);
 
 export const orderRoutes = router;

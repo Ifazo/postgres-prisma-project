@@ -1,5 +1,4 @@
 import app from "./app";
-import config from "./config";
 
 async function main() {
   app.get("/", (_req, res) => {

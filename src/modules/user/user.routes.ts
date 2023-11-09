@@ -1,14 +1,15 @@
 import { Router } from "express";
 import { userController } from "./user.controller";
 import auth from "../../middlewares/auth";
-import { USER_ROLE } from "../../enums";
+import { Role } from "@prisma/client";
 
 const router = Router();
 
 router
-  .get("/", auth(USER_ROLE.ADMIN), userController.getUsers)
-  .get("/:id", auth(USER_ROLE.ADMIN), userController.getUserById)
-  .patch("/:id",auth(USER_ROLE.ADMIN), userController.updateUserById)
-  .delete("/:id", auth(USER_ROLE.ADMIN), userController.deleteUserById);
+  .post("/", userController.createUser)
+  .get("/", auth(Role.admin), userController.getUsers)
+  .get("/:id", auth(Role.admin), userController.getUserById)
+  .patch("/:id", auth(Role.admin), userController.updateUserById)
+  .delete("/:id", auth(Role.admin), userController.deleteUserById);
 
 export const userRoutes = router;

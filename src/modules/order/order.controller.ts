@@ -14,7 +14,7 @@ const postOrder = async (req: Request, res: Response) => {
   const result = await prisma.order.create({
     data: {
       ...data,
-      userId: id,
+      user: id,
     },
   });
 
@@ -49,7 +49,7 @@ const getOrders = async (req: Request, res: Response) => {
   }
   const result = await prisma.order.findMany({
     where: {
-      userId: id,
+      user: id,
     },
   });
 
@@ -76,7 +76,7 @@ const getOrderById = async (req: Request, res: Response) => {
       id: orderId,
     },
   });
-  const { userId } = order as Order;
+  const { user } = order as Order;
   const secret = config.jwt_secret_key as Secret;
   const decodedToken = jwt.verify(token, secret) as JwtPayload;
   const { id, role } = decodedToken;
@@ -93,7 +93,7 @@ const getOrderById = async (req: Request, res: Response) => {
       data: result,
     });
   }
-  else if (userId === id) {
+  else if (user === id) {
     const result = await prisma.order.findUnique({
       where: {
         id: orderId,
@@ -114,8 +114,62 @@ const getOrderById = async (req: Request, res: Response) => {
   });
 };
 
+const deleteOrderById = async (req: Request, res: Response) => {
+  const { id: orderId } = req.params;
+  const token = req.headers.authorization as string;
+  if (!token) {
+    return res.send({
+      success: false,
+      statusCode: 401,
+      message: "Unauthorized",
+    });
+  }
+  const order = await prisma.order.findUnique({
+    where: {
+      id: orderId,
+    },
+  });
+  const { user } = order as Order;
+  const secret = config.jwt_secret_key as Secret;
+  const decodedToken = jwt.verify(token, secret) as JwtPayload;
+  const { id, role } = decodedToken;
+  if (role === "admin") {
+    const result = await prisma.order.delete({
+      where: {
+        id: orderId,
+      },
+    });
+    return res.send({
+      success: true,
+      statusCode: 200,
+      message: "Order deleted successfully",
+      data: result,
+    });
+  }
+  else if (user === id) {
+    const result = await prisma.order.delete({
+      where: {
+        id: orderId,
+      },
+    });
+    return res.send({
+      success: true,
+      statusCode: 200,
+      message: "Order deleted successfully",
+      data: result,
+    });
+  }
+
+  return res.send({
+    success: true,
+    statusCode: 200,
+    message: "Invalid order Id",
+  });
+}
+
 export const orderController = {
   postOrder,
   getOrders,
   getOrderById,
+  deleteOrderById,
 };

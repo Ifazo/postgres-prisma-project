@@ -3,6 +3,28 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const createUser = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const userExists = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (userExists) {
+    return res.status(400).send({
+      success: false,
+      message: "User already exists",
+    });
+  }
+  const user = await prisma.user.create({
+    data: req.body,
+  });
+
+  return res.status(200).send({
+    success: true,
+    message: "User created successfully",
+    data: user,
+  });
+};
+
 const getUsers = async (_req: Request, res: Response) => {
   const result = await prisma.user.findMany();
 
@@ -63,6 +85,7 @@ const deleteUserById = async (req: Request, res: Response) => {
 };
 
 export const userController = {
+  createUser,
   getUsers,
   getUserById,
   updateUserById,
