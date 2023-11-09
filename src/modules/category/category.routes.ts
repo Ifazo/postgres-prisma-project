@@ -6,7 +6,7 @@ import { Role } from "@prisma/client";
 const router = Router();
 
 router
-  .post("/create-category", auth(Role.admin), categoryController.postCategory)
+  .post("/", auth(Role.admin), categoryController.postCategory)
   .get("/", categoryController.getCategory)
   .get("/:id", categoryController.getCategoryById)
   .patch("/:id", auth(Role.admin), categoryController.updateCategoryById)
