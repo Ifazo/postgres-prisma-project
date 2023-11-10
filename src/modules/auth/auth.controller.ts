@@ -17,6 +17,7 @@ const loginUser = async (req: Request, res: Response) => {
     }
     const payload = {
       id: user.id,
+      name: user.name,
       email: user.email,
       role: user.role,
     };
@@ -41,46 +42,6 @@ const loginUser = async (req: Request, res: Response) => {
     });
   }
 };
-
-const loginAdmin = async (req: Request, res: Response) => {
-  try {
-    const { email } = req.body;
-    const admin = await prisma.admin.findUnique({
-      where: { email },
-    });
-    if (!admin) {
-      return res.status(400).send({
-        success: false,
-        message: "Admin not found!",
-      });
-    }
-    const payload = {
-      id: admin.id,
-      email: admin.email,
-      role: admin.role,
-    };
-    const secret = config.jwt_secret_key as Secret;
-    const token = jwt.sign(payload, secret);
-    req.headers.authorization = token;
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
-    return res.status(200).send({
-      success: true,
-      message: "Admin sign-in successfully",
-      token: token,
-    });
-  } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: "Internal server error",
-      error,
-    });
-  }
-};
-
 const getProfile = async (req: Request, res: Response) => {
   try {
     const token = req.headers.authorization as string;
@@ -130,7 +91,6 @@ const updateProfile = async (req: Request, res: Response) => {
 
 export const authController = {
   loginUser,
-  loginAdmin,
   getProfile,
   updateProfile,
 };

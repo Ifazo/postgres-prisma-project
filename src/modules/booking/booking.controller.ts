@@ -7,31 +7,14 @@ import { prisma } from "../../app";
 const createBooking = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    const { startDate, endDate } = data;
-    const bookingExists = await prisma.booking.findFirst({
-      where: {
-        startDate: {
-          lte: new Date(endDate),
-        },
-        endDate: {
-          gte: new Date(startDate),
-        },
-      },
-    });
-    if (bookingExists) {
-      return res.status(400).send({
-        success: false,
-        message: "Booking already exists",
-      });
-    }
     const token = req.headers.authorization as string;
     const secret = config.jwt_secret_key as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    const { email } = decodedToken;
+    const { id } = decodedToken;
     const result = await prisma.booking.create({
       data: {
         ...data,
-        user: email,
+        user: id,
       },
     });
     return res.send({

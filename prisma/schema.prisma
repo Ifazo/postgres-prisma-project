@@ -32,26 +32,14 @@ model User {
   @@map("users")
 }
 
-model Admin {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
-  image     String?
-  role      Role     @default(admin)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-
-  @@map("admins")
-}
-
 model Category {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  image     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Service   Service[]
+  id          String    @id @default(uuid())
+  name        String    @unique
+  image       String
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Service     Service[]
 
   @@map("categories")
 }
@@ -62,8 +50,10 @@ model Service {
   image       String
   description String
   price       String
+  startDate   DateTime
+  endDate     DateTime
   category    String
-  categories  Category   @relation(fields: [category], references: [name])
+  categories  Category   @relation(fields: [category], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   Review      Review[]
@@ -75,12 +65,10 @@ model Service {
 
 model Review {
   id        String   @id @default(uuid())
-  rating    String
+  rating    Int
   review    String
-  name      String
-  image     String
   user      String
-  users     User     @relation(fields: [user], references: [email])
+  users     User     @relation(fields: [user], references: [id])
   service   String
   services  Service  @relation(fields: [service], references: [id])
   createdAt DateTime @default(now())
@@ -102,10 +90,8 @@ model Post {
 
 model Booking {
   id        String   @id @default(uuid())
-  startDate DateTime
-  endDate   DateTime
   user      String
-  users     User     @relation(fields: [user], references: [email])
+  users     User     @relation(fields: [user], references: [id])
   service   String
   services  Service  @relation(fields: [service], references: [id])
   createdAt DateTime @default(now())
@@ -117,7 +103,7 @@ model Booking {
 model Wishlist {
   id        String   @id @default(uuid())
   user      String
-  users     User     @relation(fields: [user], references: [email])
+  users     User     @relation(fields: [user], references: [id])
   service   String
   services  Service  @relation(fields: [service], references: [id])
   createdAt DateTime @default(now())

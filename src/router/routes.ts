@@ -5,7 +5,6 @@ import { serviceRoutes } from "../modules/service/service.routes";
 import { reviewRoutes } from "../modules/review/review.routes";
 import { bookingRoutes } from "../modules/booking/booking.routes";
 import { authRoutes } from "../modules/auth/auth.routes";
-import { adminRoutes } from "../modules/admin/admin.routes";
 import { postRoutes } from "../modules/post/post.routes";
 import { wishlistRoutes } from "../modules/wishlist/wishlist.routes";
 
@@ -19,10 +18,6 @@ const routes = [
   {
     path: "/users",
     route: userRoutes,
-  },
-  {
-    path: "/admin",
-    route: adminRoutes,
   },
   {
     path: "/categories",
