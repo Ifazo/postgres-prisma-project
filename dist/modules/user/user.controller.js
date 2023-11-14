@@ -10,60 +10,125 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userController = void 0;
-const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
+const app_1 = require("../../app");
+const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.body;
+        const userExists = yield app_1.prisma.user.findUnique({
+            where: { email },
+        });
+        if (userExists) {
+            return res.status(400).send({
+                success: false,
+                message: "User already exists",
+            });
+        }
+        const user = yield app_1.prisma.user.create({
+            data: req.body,
+        });
+        return res.status(200).send({
+            success: true,
+            message: "User created successfully",
+            data: user,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
+});
 const getUsers = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma.user.findMany();
-    return res.send({
-        success: true,
-        statusCode: 200,
-        message: "Users get successfully",
-        data: result,
-    });
+    try {
+        const result = yield app_1.prisma.user.findMany();
+        return res.send({
+            success: true,
+            statusCode: 200,
+            message: "Users get successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const result = yield prisma.user.findUnique({
-        where: {
-            id,
-        },
-    });
-    return res.send({
-        success: true,
-        statusCode: 200,
-        message: "User get successfully",
-        data: result,
-    });
+    try {
+        const { id } = req.params;
+        const result = yield app_1.prisma.user.findUnique({
+            where: {
+                id,
+            },
+        });
+        return res.send({
+            success: true,
+            statusCode: 200,
+            message: "User get successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 const updateUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const data = req.body;
-    const result = yield prisma.user.update({
-        where: { id },
-        data,
-    });
-    return res.send({
-        success: true,
-        statusCode: 200,
-        message: "User updated successfully",
-        data: result,
-    });
+    try {
+        const { id } = req.params;
+        const data = req.body;
+        const result = yield app_1.prisma.user.update({
+            where: { id },
+            data,
+        });
+        return res.send({
+            success: true,
+            statusCode: 200,
+            message: "User updated successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 const deleteUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const result = yield prisma.user.delete({
-        where: {
-            id,
-        },
-    });
-    return res.send({
-        success: true,
-        statusCode: 200,
-        message: "User deleted successfully",
-        data: result,
-    });
+    try {
+        const { id } = req.params;
+        const result = yield app_1.prisma.user.delete({
+            where: {
+                id,
+            },
+        });
+        return res.send({
+            success: true,
+            statusCode: 200,
+            message: "User deleted successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 exports.userController = {
+    createUser,
     getUsers,
     getUserById,
     updateUserById,

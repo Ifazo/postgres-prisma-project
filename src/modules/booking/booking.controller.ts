@@ -10,11 +10,11 @@ const createBooking = async (req: Request, res: Response) => {
     const token = req.headers.authorization as string;
     const secret = config.jwt_secret_key as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    const { id } = decodedToken;
+    const { email } = decodedToken;
     const result = await prisma.booking.create({
       data: {
-        ...data,
-        user: id,
+        services: [data],
+        user: email,
       },
     });
     return res.send({
@@ -44,7 +44,7 @@ const getBookings = async (req: Request, res: Response) => {
     }
     const secret = config.jwt_secret_key as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    const { id, role } = decodedToken;
+    const { email, role } = decodedToken;
     if (role === "admin") {
       const result = await prisma.booking.findMany();
       return res.send({
@@ -56,7 +56,7 @@ const getBookings = async (req: Request, res: Response) => {
     }
     const result = await prisma.booking.findMany({
       where: {
-        user: id,
+        user: email,
       },
     });
     return res.send({
@@ -76,7 +76,7 @@ const getBookings = async (req: Request, res: Response) => {
 
 const getBooking = async (req: Request, res: Response) => {
   try {
-    const { id: bookingId } = req.params;
+    const { id } = req.params;
     const token = req.headers.authorization as string;
     if (!token) {
       return res.send({
@@ -87,7 +87,7 @@ const getBooking = async (req: Request, res: Response) => {
     }
     const booking = await prisma.booking.findUnique({
       where: {
-        id: bookingId,
+        id,
       },
     });
     const { user } = booking as Booking;
@@ -97,7 +97,7 @@ const getBooking = async (req: Request, res: Response) => {
     if (role === "admin" || email === user) {
       const result = await prisma.booking.findUnique({
         where: {
-          id: bookingId,
+          id,
         },
       });
       return res.send({
@@ -123,7 +123,7 @@ const getBooking = async (req: Request, res: Response) => {
 
 const deleteBooking = async (req: Request, res: Response) => {
   try {
-    const { id: bookingId } = req.params;
+    const { id } = req.params;
     const token = req.headers.authorization as string;
     if (!token) {
       return res.send({
@@ -134,17 +134,17 @@ const deleteBooking = async (req: Request, res: Response) => {
     }
     const booking = await prisma.booking.findUnique({
       where: {
-        id: bookingId,
+        id,
       },
     });
     const { user } = booking as Booking;
     const secret = config.jwt_secret_key as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    const { id, role } = decodedToken;
+    const { email, role } = decodedToken;
     if (role === "admin") {
       const result = await prisma.booking.delete({
         where: {
-          id: bookingId,
+          id,
         },
       });
       return res.send({
@@ -153,10 +153,10 @@ const deleteBooking = async (req: Request, res: Response) => {
         message: "Booking deleted successfully",
         data: result,
       });
-    } else if (user === id) {
+    } else if (user === email) {
       const result = await prisma.booking.delete({
         where: {
-          id: bookingId,
+          id,
         },
       });
       return res.send({

@@ -9,17 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reviewController = void 0;
+exports.wishlistController = void 0;
 const app_1 = require("../../app");
-const postReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield app_1.prisma.review.create({
-            data: req.body,
+        const data = req.body;
+        const result = yield app_1.prisma.wishlist.create({
+            data,
         });
         return res.send({
             success: true,
             statusCode: 200,
-            message: "Review created successfully",
+            message: "Wishlist created successfully",
             data: result,
         });
     }
@@ -31,18 +32,18 @@ const postReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
 });
-const getReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const result = yield app_1.prisma.review.findMany({
+        const result = yield app_1.prisma.wishlist.findMany({
             where: {
-                service: id,
+                user: id,
             },
         });
         return res.send({
             success: true,
             statusCode: 200,
-            message: "Review get successfully",
+            message: "Wishlist get successfully",
             data: result,
         });
     }
@@ -54,34 +55,10 @@ const getReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
 });
-const updateReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const result = yield app_1.prisma.review.update({
-            where: {
-                id,
-            },
-            data: req.body,
-        });
-        return res.send({
-            success: true,
-            statusCode: 200,
-            message: "Review updated successfully",
-            data: result,
-        });
-    }
-    catch (error) {
-        return res.status(500).send({
-            success: false,
-            message: "Internal server error",
-            error,
-        });
-    }
-});
-const deleteReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const result = yield app_1.prisma.review.delete({
+        const result = yield app_1.prisma.wishlist.delete({
             where: {
                 id,
             },
@@ -89,7 +66,7 @@ const deleteReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         return res.send({
             success: true,
             statusCode: 200,
-            message: "Review deleted successfully",
+            message: "Wishlist deleted successfully",
             data: result,
         });
     }
@@ -101,9 +78,8 @@ const deleteReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
 });
-exports.reviewController = {
-    postReview,
-    getReviews,
-    updateReview,
-    deleteReview,
+exports.wishlistController = {
+    createWishlist,
+    getWishlist,
+    deleteWishlist,
 };

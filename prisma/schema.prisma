@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,7 +17,7 @@ model User {
   id        String     @id @default(uuid())
   email     String     @unique
   password  String
-  name      String?
+  name      String
   image     String?
   role      Role       @default(user)
   createdAt DateTime   @default(now())
@@ -28,6 +25,7 @@ model User {
   Review    Review[]
   Booking   Booking[]
   Wishlist  Wishlist[]
+  Post      Post[]
 
   @@map("users")
 }
@@ -45,7 +43,7 @@ model Category {
 }
 
 model Service {
-  id          String     @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   image       String
   description String
@@ -53,12 +51,10 @@ model Service {
   startDate   DateTime
   endDate     DateTime
   category    String
-  categories  Category   @relation(fields: [category], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  categories  Category @relation(fields: [category], references: [name])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   Review      Review[]
-  Booking     Booking[]
-  Wishlist    Wishlist[]
 
   @@map("services")
 }
@@ -68,7 +64,9 @@ model Review {
   rating    Int
   review    String
   user      String
-  users     User     @relation(fields: [user], references: [id])
+  users     User     @relation(fields: [user], references: [email])
+  name      String?
+  image     String?
   service   String
   services  Service  @relation(fields: [service], references: [id])
   createdAt DateTime @default(now())
@@ -82,6 +80,11 @@ model Post {
   title     String
   image     String
   content   String
+  user      String
+  name      String?
+  email     String?
+  icon      String?
+  users     User     @relation(fields: [user], references: [email])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -91,9 +94,8 @@ model Post {
 model Booking {
   id        String   @id @default(uuid())
   user      String
-  users     User     @relation(fields: [user], references: [id])
-  service   String
-  services  Service  @relation(fields: [service], references: [id])
+  users     User     @relation(fields: [user], references: [email])
+  services  Json[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -103,9 +105,8 @@ model Booking {
 model Wishlist {
   id        String   @id @default(uuid())
   user      String
-  users     User     @relation(fields: [user], references: [id])
-  service   String
-  services  Service  @relation(fields: [service], references: [id])
+  users     User     @relation(fields: [user], references: [email])
+  service   Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

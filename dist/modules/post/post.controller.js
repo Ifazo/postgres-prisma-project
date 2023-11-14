@@ -9,17 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reviewController = void 0;
+exports.postController = void 0;
 const app_1 = require("../../app");
-const postReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield app_1.prisma.review.create({
+        const result = yield app_1.prisma.post.create({
             data: req.body,
         });
         return res.send({
             success: true,
             statusCode: 200,
-            message: "Review created successfully",
+            message: "Post created successfully",
             data: result,
         });
     }
@@ -31,18 +31,36 @@ const postReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
 });
-const getReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getPosts = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield app_1.prisma.post.findMany();
+        return res.send({
+            success: true,
+            statusCode: 200,
+            message: "Post get successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
+});
+const getPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const result = yield app_1.prisma.review.findMany({
+        const result = yield app_1.prisma.post.findUnique({
             where: {
-                service: id,
+                id,
             },
         });
         return res.send({
             success: true,
             statusCode: 200,
-            message: "Review get successfully",
+            message: "Post get successfully",
             data: result,
         });
     }
@@ -54,10 +72,10 @@ const getReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
 });
-const updateReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const result = yield app_1.prisma.review.update({
+        const result = yield app_1.prisma.post.update({
             where: {
                 id,
             },
@@ -66,7 +84,7 @@ const updateReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         return res.send({
             success: true,
             statusCode: 200,
-            message: "Review updated successfully",
+            message: "Post updated successfully",
             data: result,
         });
     }
@@ -78,10 +96,10 @@ const updateReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
 });
-const deleteReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const result = yield app_1.prisma.review.delete({
+        const result = yield app_1.prisma.post.delete({
             where: {
                 id,
             },
@@ -89,7 +107,7 @@ const deleteReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         return res.send({
             success: true,
             statusCode: 200,
-            message: "Review deleted successfully",
+            message: "Post deleted successfully",
             data: result,
         });
     }
@@ -97,13 +115,13 @@ const deleteReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         return res.status(500).send({
             success: false,
             message: "Internal server error",
-            error,
         });
     }
 });
-exports.reviewController = {
-    postReview,
-    getReviews,
-    updateReview,
-    deleteReview,
+exports.postController = {
+    createPost,
+    getPosts,
+    getPost,
+    updatePost,
+    deletePost,
 };

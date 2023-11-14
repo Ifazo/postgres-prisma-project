@@ -4,7 +4,7 @@ import { authController } from "./auth.controller";
 const router = Router();
 
 router
-  .post("/user", authController.loginUser)
+  .post("/", authController.loginUser)
   .get("/profile", authController.getProfile)
   .patch("/profile", authController.updateProfile);
 

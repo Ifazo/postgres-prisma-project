@@ -13,80 +13,98 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authController = void 0;
-const client_1 = require("@prisma/client");
 const config_1 = __importDefault(require("../../config"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const prisma = new client_1.PrismaClient();
-const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.body;
-    const userExists = yield prisma.user.findUnique({
-        where: { email },
-    });
-    if (userExists) {
-        return res.status(400).send({
-            success: false,
-            statusCode: 400,
-            message: "User already exists",
-        });
-    }
-    const user = yield prisma.user.create({
-        data: req.body,
-    });
-    return res.status(200).send({
-        success: true,
-        statusCode: 200,
-        message: "User created successfully",
-        data: user,
-    });
-});
+const app_1 = require("../../app");
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.body;
-    const user = yield prisma.user.findUnique({
-        where: { email },
-    });
-    if (!user) {
-        return res.status(400).send({
-            success: false,
-            statusCode: 400,
-            message: "User not found!",
+    try {
+        const { email } = req.body;
+        const user = yield app_1.prisma.user.findUnique({
+            where: { email },
+        });
+        if (!user) {
+            return res.status(400).send({
+                success: false,
+                message: "User not found!",
+            });
+        }
+        const payload = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+        };
+        const secret = config_1.default.jwt_secret_key;
+        const token = jsonwebtoken_1.default.sign(payload, secret);
+        req.headers.authorization = token;
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
+        return res.status(200).send({
+            success: true,
+            message: "User sign-in successfully",
+            token: token,
         });
     }
-    const payload = {
-        id: user.id,
-        role: user.role,
-    };
-    const secret = config_1.default.jwt_secret_key;
-    const token = jsonwebtoken_1.default.sign(payload, secret);
-    req.headers.authorization = token;
-    res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-    });
-    return res.status(200).send({
-        success: true,
-        statusCode: 200,
-        message: "User sign-in successfully",
-        token: token,
-    });
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
-const profile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.headers.authorization;
-    const secret = config_1.default.jwt_secret_key;
-    const decodedToken = jsonwebtoken_1.default.verify(token, secret);
-    const { id } = decodedToken;
-    const user = yield prisma.user.findUnique({
-        where: { id },
-    });
-    return res.status(200).send({
-        success: true,
-        statusCode: 200,
-        message: "User profile",
-        data: user,
-    });
+const getProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const token = req.headers.authorization;
+        const secret = config_1.default.jwt_secret_key;
+        const decodedToken = jsonwebtoken_1.default.verify(token, secret);
+        const { id } = decodedToken;
+        const user = yield app_1.prisma.user.findUnique({
+            where: { id },
+        });
+        return res.status(200).send({
+            success: true,
+            message: "User profile fetched successfully",
+            data: user,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
+});
+const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const token = req.headers.authorization;
+        const secret = config_1.default.jwt_secret_key;
+        const decodedToken = jsonwebtoken_1.default.verify(token, secret);
+        const { id } = decodedToken;
+        const user = yield app_1.prisma.user.update({
+            where: { id },
+            data: req.body,
+        });
+        return res.status(200).send({
+            success: true,
+            message: "User profile updated successfully",
+            data: user,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 exports.authController = {
-    createUser,
     loginUser,
-    profile,
+    getProfile,
+    updateProfile,
 };

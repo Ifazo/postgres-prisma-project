@@ -10,68 +10,109 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.categoryController = void 0;
-const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
+const app_1 = require("../../app");
 const postCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma.category.create({
-        data: req.body,
-    });
-    return res.send({
-        success: true,
-        statusCode: 200,
-        message: "Category created successfully",
-        data: result,
-    });
+    try {
+        const result = yield app_1.prisma.category.create({
+            data: req.body,
+        });
+        return res.status(200).send({
+            success: true,
+            message: "Category created successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 const getCategory = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma.category.findMany();
-    return res.send({
-        success: true,
-        statusCode: 200,
-        message: "Categories get successfully",
-        data: result,
-    });
+    try {
+        const result = yield app_1.prisma.category.findMany();
+        return res.status(200).send({
+            success: true,
+            message: "Categories get successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 const getCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const result = yield prisma.category.findUnique({
-        where: {
-            id,
-        },
-    });
-    return res.send({
-        success: true,
-        statusCode: 200,
-        message: "Category get successfully",
-        data: result,
-    });
+    try {
+        const { id } = req.params;
+        const result = yield app_1.prisma.category.findUnique({
+            where: {
+                id,
+            },
+        });
+        return res.status(200).send({
+            success: true,
+            message: "Category get successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 const updateCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const result = yield prisma.category.update({
-        where: { id },
-        data: req.body,
-    });
-    return res.send({
-        success: true,
-        statusCode: 200,
-        message: "Category updated successfully",
-        data: result,
-    });
+    try {
+        const { id } = req.params;
+        const result = yield app_1.prisma.category.update({
+            where: { id },
+            data: req.body,
+        });
+        return res.send({
+            success: true,
+            statusCode: 200,
+            message: "Category updated successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 const deleteCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const result = yield prisma.category.delete({
-        where: {
-            id,
-        },
-    });
-    return res.send({
-        success: true,
-        statusCode: 200,
-        message: "Category deleted successfully",
-        data: result,
-    });
+    try {
+        const { id } = req.params;
+        const result = yield app_1.prisma.category.delete({
+            where: {
+                id,
+            },
+        });
+        return res.send({
+            success: true,
+            statusCode: 200,
+            message: "Category deleted successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
 });
 exports.categoryController = {
     postCategory,

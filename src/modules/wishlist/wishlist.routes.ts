@@ -7,6 +7,7 @@ const router = Router();
 
 router
   .post("/", auth(Role.user), wishlistController.createWishlist)
+  .get("/", auth(Role.user), wishlistController.userWishlist)
   .get("/:id", auth(Role.user), wishlistController.getWishlist)
   .delete("/:id", auth(Role.user), wishlistController.deleteWishlist);
 

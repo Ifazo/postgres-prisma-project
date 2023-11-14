@@ -1,10 +1,18 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
+import config from "../../config";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
 const postReview = async (req: Request, res: Response) => {
   try {
+    const data = req.body;
+    const token = req.headers.authorization as string;
+    const secret = config.jwt_secret_key as Secret;
+    const decodedToken = jwt.verify(token, secret) as JwtPayload;
+    const { email } = decodedToken;
+    data.user = email;
     const result = await prisma.review.create({
-      data: req.body,
+      data,
     });
     return res.send({
       success: true,
@@ -47,11 +55,12 @@ const getReviews = async (req: Request, res: Response) => {
 const updateReview = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const data = req.body;
     const result = await prisma.review.update({
       where: {
         id,
       },
-      data: req.body,
+      data,
     });
     return res.send({
       success: true,
