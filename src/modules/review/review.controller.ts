@@ -9,8 +9,10 @@ const postReview = async (req: Request, res: Response) => {
     const token = req.headers.authorization as string;
     const secret = config.jwt_secret_key as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    const { email } = decodedToken;
+    const { email, name, image } = decodedToken;
     data.user = email;
+    data.name = name;
+    data.image = image;
     const result = await prisma.review.create({
       data,
     });

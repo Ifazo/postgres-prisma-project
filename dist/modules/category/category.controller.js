@@ -30,7 +30,7 @@ const postCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
 });
-const getCategory = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield app_1.prisma.category.findMany();
         return res.status(200).send({
@@ -50,9 +50,17 @@ const getCategory = (_req, res) => __awaiter(void 0, void 0, void 0, function* (
 const getCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const result = yield app_1.prisma.category.findUnique({
+        const category = yield app_1.prisma.category.findUnique({
             where: {
                 id,
+            },
+        });
+        const result = yield app_1.prisma.service.findMany({
+            where: {
+                category: {
+                    contains: category === null || category === void 0 ? void 0 : category.name,
+                    mode: "insensitive",
+                },
             },
         });
         return res.status(200).send({

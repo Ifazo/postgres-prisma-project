@@ -11,11 +11,9 @@ const createBooking = async (req: Request, res: Response) => {
     const secret = config.jwt_secret_key as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
     const { email } = decodedToken;
+    data.user = email;
     const result = await prisma.booking.create({
-      data: {
-        services: [data],
-        user: email,
-      },
+      data,
     });
     return res.send({
       success: true,

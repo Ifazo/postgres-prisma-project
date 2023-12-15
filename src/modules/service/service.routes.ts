@@ -8,8 +8,20 @@ const router = Router();
 router
   .get("/", serviceController.getServices)
   .get("/:id", serviceController.getServiceById)
-  .post("/", auth(Role.admin), serviceController.createService)
-  .patch("/:id", auth(Role.admin), serviceController.updateServiceById)
-  .delete("/:id", auth(Role.admin), serviceController.deleteServiceById);
+  .post(
+    "/",
+    auth(Role.admin, Role.super_admin),
+    serviceController.createService
+  )
+  .patch(
+    "/:id",
+    auth(Role.admin, Role.super_admin),
+    serviceController.updateServiceById
+  )
+  .delete(
+    "/:id",
+    auth(Role.admin, Role.super_admin),
+    serviceController.deleteServiceById
+  );
 
 export const serviceRoutes = router;

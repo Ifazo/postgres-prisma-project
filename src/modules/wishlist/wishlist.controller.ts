@@ -10,8 +10,9 @@ const createWishlist = async (req: Request, res: Response) => {
     const secret = config.jwt_secret_key as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
     const { email } = decodedToken;
+    data.user = email;
     const result = await prisma.wishlist.create({
-      data: { user: email, service: data },
+      data,
     });
     return res.send({
       success: true,

@@ -23,8 +23,9 @@ const createBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const secret = config_1.default.jwt_secret_key;
         const decodedToken = jsonwebtoken_1.default.verify(token, secret);
         const { email } = decodedToken;
+        data.user = email;
         const result = yield app_1.prisma.booking.create({
-            data: Object.assign(Object.assign({}, data), { user: email }),
+            data,
         });
         return res.send({
             success: true,
@@ -53,7 +54,7 @@ const getBookings = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
         const secret = config_1.default.jwt_secret_key;
         const decodedToken = jsonwebtoken_1.default.verify(token, secret);
-        const { id, role } = decodedToken;
+        const { email, role } = decodedToken;
         if (role === "admin") {
             const result = yield app_1.prisma.booking.findMany();
             return res.send({
@@ -65,7 +66,7 @@ const getBookings = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
         const result = yield app_1.prisma.booking.findMany({
             where: {
-                user: id,
+                user: email,
             },
         });
         return res.send({

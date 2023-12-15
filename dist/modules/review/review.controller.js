@@ -8,13 +8,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reviewController = void 0;
 const app_1 = require("../../app");
+const config_1 = __importDefault(require("../../config"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const postReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const data = req.body;
+        const token = req.headers.authorization;
+        const secret = config_1.default.jwt_secret_key;
+        const decodedToken = jsonwebtoken_1.default.verify(token, secret);
+        const { email, name, image } = decodedToken;
+        data.user = email;
+        data.name = name;
+        data.image = image;
         const result = yield app_1.prisma.review.create({
-            data: req.body,
+            data,
         });
         return res.send({
             success: true,
@@ -57,11 +70,12 @@ const getReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 const updateReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
+        const data = req.body;
         const result = yield app_1.prisma.review.update({
             where: {
                 id,
             },
-            data: req.body,
+            data,
         });
         return res.send({
             success: true,

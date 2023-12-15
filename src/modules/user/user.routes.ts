@@ -7,9 +7,18 @@ const router = Router();
 
 router
   .post("/", userController.createUser)
-  .get("/", auth(Role.admin), userController.getUsers)
-  .get("/:id", auth(Role.admin), userController.getUserById)
-  .patch("/:id", auth(Role.admin), userController.updateUserById)
-  .delete("/:id", auth(Role.admin), userController.deleteUserById);
+  .get("/", auth(Role.admin, Role.super_admin), userController.getUsers)
+  .get("/admins", auth(Role.super_admin), userController.getAdmins)
+  .get("/:id", auth(Role.admin, Role.super_admin), userController.getUserById)
+  .patch(
+    "/:id",
+    auth(Role.admin, Role.super_admin),
+    userController.updateUserById
+  )
+  .delete(
+    "/:id",
+    auth(Role.admin, Role.super_admin),
+    userController.deleteUserById
+  );
 
 export const userRoutes = router;

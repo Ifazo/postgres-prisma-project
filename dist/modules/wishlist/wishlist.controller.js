@@ -8,12 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.wishlistController = void 0;
 const app_1 = require("../../app");
+const config_1 = __importDefault(require("../../config"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const createWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = req.body;
+        const token = req.headers.authorization;
+        const secret = config_1.default.jwt_secret_key;
+        const decodedToken = jsonwebtoken_1.default.verify(token, secret);
+        const { email } = decodedToken;
+        data.user = email;
         const result = yield app_1.prisma.wishlist.create({
             data,
         });
@@ -32,12 +42,38 @@ const createWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
     }
 });
+const userWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const token = req.headers.authorization;
+        const secret = config_1.default.jwt_secret_key;
+        const decodedToken = jsonwebtoken_1.default.verify(token, secret);
+        const { email } = decodedToken;
+        const result = yield app_1.prisma.wishlist.findMany({
+            where: {
+                user: email,
+            },
+        });
+        return res.send({
+            success: true,
+            statusCode: 200,
+            message: "Wishlist get successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
+});
 const getWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const result = yield app_1.prisma.wishlist.findMany({
+        const result = yield app_1.prisma.wishlist.findUnique({
             where: {
-                user: id,
+                id,
             },
         });
         return res.send({
@@ -80,6 +116,7 @@ const deleteWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.wishlistController = {
     createWishlist,
+    userWishlist,
     getWishlist,
     deleteWishlist,
 };

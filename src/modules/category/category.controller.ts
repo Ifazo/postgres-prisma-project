@@ -20,14 +20,14 @@ const postCategory = async (req: Request, res: Response) => {
   }
 };
 
-const getCategory = async (_req: Request, res: Response) => {
+const getCategory = async (req: Request, res: Response) => {
   try {
-    const result = await prisma.category.findMany();
-    return res.status(200).send({
-      success: true,
-      message: "Categories get successfully",
-      data: result,
-    });
+      const result = await prisma.category.findMany();
+      return res.status(200).send({
+        success: true,
+        message: "Categories get successfully",
+        data: result,
+      });
   } catch (error) {
     return res.status(500).send({
       success: false,
@@ -40,9 +40,17 @@ const getCategory = async (_req: Request, res: Response) => {
 const getCategoryById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const result = await prisma.category.findUnique({
+    const category = await prisma.category.findUnique({
       where: {
         id,
+      },
+    });
+    const result = await prisma.service.findMany({
+      where: {
+        category: {
+          contains: category?.name,
+          mode: "insensitive",
+        },
       },
     });
     return res.status(200).send({

@@ -11,6 +11,7 @@ const client_1 = require("@prisma/client");
 const router = (0, express_1.Router)();
 router
     .post("/", (0, auth_1.default)(client_1.Role.user), wishlist_controller_1.wishlistController.createWishlist)
+    .get("/", (0, auth_1.default)(client_1.Role.user), wishlist_controller_1.wishlistController.userWishlist)
     .get("/:id", (0, auth_1.default)(client_1.Role.user), wishlist_controller_1.wishlistController.getWishlist)
     .delete("/:id", (0, auth_1.default)(client_1.Role.user), wishlist_controller_1.wishlistController.deleteWishlist);
 exports.wishlistRoutes = router;

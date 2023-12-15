@@ -42,11 +42,33 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 const getUsers = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield app_1.prisma.user.findMany();
+        const result = yield app_1.prisma.user.findMany({
+            where: { role: "user" },
+        });
         return res.send({
             success: true,
             statusCode: 200,
             message: "Users get successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error,
+        });
+    }
+});
+const getAdmins = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield app_1.prisma.user.findMany({
+            where: { role: "admin" },
+        });
+        return res.send({
+            success: true,
+            statusCode: 200,
+            message: "Admin get successfully",
             data: result,
         });
     }
@@ -130,6 +152,7 @@ const deleteUserById = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.userController = {
     createUser,
     getUsers,
+    getAdmins,
     getUserById,
     updateUserById,
     deleteUserById,

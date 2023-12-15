@@ -12,7 +12,7 @@ const router = (0, express_1.Router)();
 router
     .get("/", service_controller_1.serviceController.getServices)
     .get("/:id", service_controller_1.serviceController.getServiceById)
-    .post("/", (0, auth_1.default)(client_1.Role.admin), service_controller_1.serviceController.createService)
-    .patch("/:id", (0, auth_1.default)(client_1.Role.admin), service_controller_1.serviceController.updateServiceById)
-    .delete("/:id", (0, auth_1.default)(client_1.Role.admin), service_controller_1.serviceController.deleteServiceById);
+    .post("/", (0, auth_1.default)(client_1.Role.admin, client_1.Role.super_admin), service_controller_1.serviceController.createService)
+    .patch("/:id", (0, auth_1.default)(client_1.Role.admin, client_1.Role.super_admin), service_controller_1.serviceController.updateServiceById)
+    .delete("/:id", (0, auth_1.default)(client_1.Role.admin, client_1.Role.super_admin), service_controller_1.serviceController.deleteServiceById);
 exports.serviceRoutes = router;

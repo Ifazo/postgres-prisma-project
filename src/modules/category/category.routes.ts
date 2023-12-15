@@ -6,10 +6,22 @@ import { Role } from "@prisma/client";
 const router = Router();
 
 router
-  .post("/", auth(Role.admin), categoryController.postCategory)
+  .post(
+    "/",
+    auth(Role.admin, Role.super_admin),
+    categoryController.postCategory
+  )
   .get("/", categoryController.getCategory)
   .get("/:id", categoryController.getCategoryById)
-  .patch("/:id", auth(Role.admin), categoryController.updateCategoryById)
-  .delete("/:id", auth(Role.admin), categoryController.deleteCategoryById);
+  .patch(
+    "/:id",
+    auth(Role.admin, Role.super_admin),
+    categoryController.updateCategoryById
+  )
+  .delete(
+    "/:id",
+    auth(Role.admin, Role.super_admin),
+    categoryController.deleteCategoryById
+  );
 
 export const categoryRoutes = router;

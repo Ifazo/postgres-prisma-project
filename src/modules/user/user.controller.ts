@@ -32,11 +32,33 @@ const createUser = async (req: Request, res: Response) => {
 
 const getUsers = async (_req: Request, res: Response) => {
   try {
-    const result = await prisma.user.findMany();
+    const result = await prisma.user.findMany({
+      where: { role: "user" },
+    });
     return res.send({
       success: true,
       statusCode: 200,
       message: "Users get successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Internal server error",
+      error,
+    });
+  }
+};
+
+const getAdmins = async (_req: Request, res: Response) => {
+  try {
+    const result = await prisma.user.findMany({
+      where: { role: "admin" },
+    });
+    return res.send({
+      success: true,
+      statusCode: 200,
+      message: "Admin get successfully",
       data: result,
     });
   } catch (error) {
@@ -120,6 +142,7 @@ const deleteUserById = async (req: Request, res: Response) => {
 export const userController = {
   createUser,
   getUsers,
+  getAdmins,
   getUserById,
   updateUserById,
   deleteUserById,
