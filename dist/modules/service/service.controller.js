@@ -33,15 +33,55 @@ const createService = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 const getServices = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { startDate, endDate, category, upcoming, ongoing, ended } = req.query;
-        if (startDate && endDate) {
+        const { search, startDate, endDate, category, upcoming, ongoing, ended, page, take, } = req.query;
+        if (search) {
+            const result = yield app_1.prisma.service.findMany({
+                where: {
+                    OR: [
+                        {
+                            name: {
+                                contains: search,
+                                mode: "insensitive",
+                            },
+                        },
+                        {
+                            description: {
+                                contains: search,
+                                mode: "insensitive",
+                            },
+                        },
+                    ],
+                },
+            });
+            return res.status(200).send({
+                success: true,
+                message: "Services by search get successfully",
+                data: result,
+            });
+        }
+        else if (page && take) {
+            const result = yield app_1.prisma.service.findMany({
+                skip: (Number(page) - 1) * Number(take) || 0,
+                take: Number(take) || 10,
+            });
+            const total = yield app_1.prisma.service.count();
+            const totalPage = Math.ceil(total / Number(take));
+            return res.status(200).send({
+                success: true,
+                message: "Services by pagination get successfully",
+                total,
+                totalPage,
+                data: result,
+            });
+        }
+        else if (startDate && endDate) {
             const result = yield app_1.prisma.service.findMany({
                 where: {
                     startDate: {
-                        gte: new Date(startDate),
+                        gte: new Date(),
                     },
                     endDate: {
-                        lte: new Date(endDate),
+                        lte: new Date(),
                     },
                 },
             });
@@ -109,8 +149,10 @@ const getServices = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             });
         }
         else {
-            const result = (yield app_1.prisma.service.findMany()).sort((a, b) => {
-                return a.startDate.getTime() - b.startDate.getTime();
+            const result = yield app_1.prisma.service.findMany({
+                orderBy: {
+                    createdAt: "desc",
+                },
             });
             return res.status(200).send({
                 success: true,

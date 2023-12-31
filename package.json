@@ -1,11 +1,11 @@
 {
-  "name": "prisma-postgres-project",
+  "name": "express-ts-project",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon ./src/server.ts",
-    "start": "node ./dist/server.js",
+    "dev": "nodemon ./src/index.ts",
+    "start": "node ./dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "prisma generate"
   },
