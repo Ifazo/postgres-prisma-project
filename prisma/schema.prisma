@@ -17,14 +17,16 @@ model User {
   id        String     @id @default(uuid())
   email     String     @unique
   password  String
-  name      String
+  name      String?
   image     String?
   role      Role       @default(user)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt()
   Review    Review[]
-  Booking   Booking[]
   Wishlist  Wishlist[]
+  Order     Order[]
+  Service   Service[]
+  Booking   Booking[]
   Post      Post[]
 
   @@map("users")
@@ -37,38 +39,52 @@ model Category {
   description String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  Service     Service[]
+  Product     Product[]
 
   @@map("categories")
 }
 
-model Service {
+model Product {
   id          String   @id @default(uuid())
   name        String
   image       String
   description String
-  price       String
-  startDate   DateTime
-  endDate     DateTime
-  category    String
-  categories  Category @relation(fields: [category], references: [name])
+  price       Float
+  stock       Int
+  catagoeryId String   @map("catagoery_id")
+  category    Category @relation(fields: [catagoeryId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   Review      Review[]
+
+  @@map("products")
+}
+
+model Service {
+  id          String    @id @default(uuid())
+  name        String
+  image       String
+  description String
+  price       Float
+  startDate   DateTime
+  endDate     DateTime
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Booking     Booking[]
 
   @@map("services")
 }
 
 model Review {
   id        String   @id @default(uuid())
-  rating    Int
+  rating    Float
   review    String
-  user      String
-  users     User     @relation(fields: [user], references: [email])
-  name      String?
-  image     String?
-  service   String
-  services  Service  @relation(fields: [service], references: [id])
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -77,38 +93,47 @@ model Review {
 
 model Post {
   id        String   @id @default(uuid())
-  title     String
   image     String
+  title     String
   content   String
-  user      String
-  name      String?
-  email     String?
-  icon      String?
-  users     User     @relation(fields: [user], references: [email])
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("posts")
 }
 
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  service   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("wishlists")
+}
+
 model Booking {
   id        String   @id @default(uuid())
-  user      String
-  users     User     @relation(fields: [user], references: [email])
-  services  Json[]
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  serviceId String   @map("service_id")
+  service   Service  @relation(fields: [serviceId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("bookings")
 }
 
-model Wishlist {
+model Order {
   id        String   @id @default(uuid())
-  user      String
-  users     User     @relation(fields: [user], references: [email])
-  service   Json
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  products  Json[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("wishlists")
+  @@map("orders")
 }

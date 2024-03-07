@@ -26,8 +26,7 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -44,8 +43,7 @@ const getPosts = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -67,8 +65,7 @@ const getPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -91,8 +88,7 @@ const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });

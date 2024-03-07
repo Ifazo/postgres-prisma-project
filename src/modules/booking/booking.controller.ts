@@ -1,4 +1,4 @@
-import { Booking } from "@prisma/client";
+import { Booking, Role } from "@prisma/client";
 import { Request, Response } from "express";
 import config from "../../config";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
@@ -24,8 +24,7 @@ const createBooking = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -66,8 +65,7 @@ const getBookings = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -88,11 +86,18 @@ const getBooking = async (req: Request, res: Response) => {
         id,
       },
     });
-    const { user } = booking as Booking;
+    const { userId } = booking as Booking;
+    const user = prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
     const secret = config.jwt_secret_key as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
     const { email, role } = decodedToken;
-    if (role === "admin" || email === user) {
+
+    if (role === Role.admin || email === user) {
       const result = await prisma.booking.findUnique({
         where: {
           id,
@@ -113,8 +118,7 @@ const getBooking = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -135,11 +139,17 @@ const deleteBooking = async (req: Request, res: Response) => {
         id,
       },
     });
-    const { user } = booking as Booking;
+    const { userId } = booking as Booking;
+    const user = prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
     const secret = config.jwt_secret_key as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
     const { email, role } = decodedToken;
-    if (role === "admin") {
+    if (role === Role.admin) {
       const result = await prisma.booking.delete({
         where: {
           id,
@@ -172,8 +182,7 @@ const deleteBooking = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };

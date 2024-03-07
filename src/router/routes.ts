@@ -7,6 +7,7 @@ import { bookingRoutes } from "../modules/booking/booking.routes";
 import { authRoutes } from "../modules/auth/auth.routes";
 import { postRoutes } from "../modules/post/post.routes";
 import { wishlistRoutes } from "../modules/wishlist/wishlist.routes";
+import { productRoutes } from "../modules/product/product.routes";
 
 const router = Router();
 
@@ -24,23 +25,27 @@ const routes = [
     route: categoryRoutes,
   },
   {
-    path: "/services",
+    path: "/products",
+    route: productRoutes,
+  },
+{
+  path: "/services",
     route: serviceRoutes,
   },
-  {
-    path: "/reviews",
+{
+  path: "/reviews",
     route: reviewRoutes,
   },
-  {
-    path: "/bookings",
+{
+  path: "/bookings",
     route: bookingRoutes,
   },
-  {
-    path: "/wishlist",
+{
+  path: "/wishlist",
     route: wishlistRoutes,
   },
-  {
-    path: "/posts",
+{
+  path: "/posts",
     route: postRoutes,
   },
 ];

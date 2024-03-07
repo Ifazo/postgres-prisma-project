@@ -13,12 +13,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
+const config_1 = __importDefault(require("./config"));
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         app_1.default.get("/", (_req, res) => {
-            res.send("Hello Prisma World!");
+            res.send("Hello from Prisma World!");
         });
-        const port = 5000;
+        app_1.default.get("/api", (_req, res) => {
+            res.send("Express server api running successfully!");
+        });
+        const port = config_1.default.port;
         app_1.default.listen(port, () => console.log(`🚀 Server ready at Port: ${port} ⭐️`));
     });
 }

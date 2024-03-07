@@ -15,8 +15,7 @@ const createPost = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -33,8 +32,7 @@ const getPosts = async (_req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -56,8 +54,7 @@ const getPost = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -80,8 +77,7 @@ const updatePost = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };

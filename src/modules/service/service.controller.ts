@@ -12,11 +12,9 @@ const createService = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -27,7 +25,6 @@ const getServices = async (req: Request, res: Response) => {
       search,
       startDate,
       endDate,
-      category,
       upcoming,
       ongoing,
       ended,
@@ -88,17 +85,6 @@ const getServices = async (req: Request, res: Response) => {
         message: "Services by date get successfully",
         data: result,
       });
-    } else if (category) {
-      const result = await prisma.service.findMany({
-        where: {
-          category: category as string,
-        },
-      });
-      return res.status(200).send({
-        success: true,
-        message: "Services by category get successfully",
-        data: result,
-      });
     } else if (upcoming) {
       const result = await prisma.service.findMany({
         where: {
@@ -156,8 +142,7 @@ const getServices = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -178,8 +163,7 @@ const getServiceById = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -200,8 +184,7 @@ const updateServiceById = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -222,8 +205,7 @@ const deleteServiceById = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };

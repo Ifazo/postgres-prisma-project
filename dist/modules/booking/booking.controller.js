@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bookingController = void 0;
+const client_1 = require("@prisma/client");
 const config_1 = __importDefault(require("../../config"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const app_1 = require("../../app");
@@ -37,8 +38,7 @@ const createBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -79,8 +79,7 @@ const getBookings = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -100,11 +99,16 @@ const getBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 id,
             },
         });
-        const { user } = booking;
+        const { userId } = booking;
+        const user = app_1.prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+        });
         const secret = config_1.default.jwt_secret_key;
         const decodedToken = jsonwebtoken_1.default.verify(token, secret);
         const { email, role } = decodedToken;
-        if (role === "admin" || email === user) {
+        if (role === client_1.Role.admin || email === user) {
             const result = yield app_1.prisma.booking.findUnique({
                 where: {
                     id,
@@ -127,8 +131,7 @@ const getBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -148,11 +151,16 @@ const deleteBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 id,
             },
         });
-        const { user } = booking;
+        const { userId } = booking;
+        const user = app_1.prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+        });
         const secret = config_1.default.jwt_secret_key;
         const decodedToken = jsonwebtoken_1.default.verify(token, secret);
         const { email, role } = decodedToken;
-        if (role === "admin") {
+        if (role === client_1.Role.admin) {
             const result = yield app_1.prisma.booking.delete({
                 where: {
                     id,
@@ -187,8 +195,7 @@ const deleteBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });

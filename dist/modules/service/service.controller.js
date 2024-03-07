@@ -23,17 +23,15 @@ const createService = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
     catch (error) {
-        console.log(error);
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
 const getServices = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { search, startDate, endDate, category, upcoming, ongoing, ended, page, take, } = req.query;
+        const { search, startDate, endDate, upcoming, ongoing, ended, page, take, } = req.query;
         if (search) {
             const result = yield app_1.prisma.service.findMany({
                 where: {
@@ -88,18 +86,6 @@ const getServices = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             return res.status(200).send({
                 success: true,
                 message: "Services by date get successfully",
-                data: result,
-            });
-        }
-        else if (category) {
-            const result = yield app_1.prisma.service.findMany({
-                where: {
-                    category: category,
-                },
-            });
-            return res.status(200).send({
-                success: true,
-                message: "Services by category get successfully",
                 data: result,
             });
         }
@@ -164,8 +150,7 @@ const getServices = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -186,8 +171,7 @@ const getServiceById = (req, res) => __awaiter(void 0, void 0, void 0, function*
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -208,8 +192,7 @@ const updateServiceById = (req, res) => __awaiter(void 0, void 0, void 0, functi
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -230,8 +213,7 @@ const deleteServiceById = (req, res) => __awaiter(void 0, void 0, void 0, functi
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });

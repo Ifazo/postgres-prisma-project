@@ -37,8 +37,7 @@ const createWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function*
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -63,8 +62,7 @@ const userWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -86,8 +84,7 @@ const getWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -109,8 +106,7 @@ const deleteWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function*
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });

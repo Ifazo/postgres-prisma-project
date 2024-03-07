@@ -25,8 +25,7 @@ const postCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -42,25 +41,16 @@ const getCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
 const getCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const category = yield app_1.prisma.category.findUnique({
+        const result = yield app_1.prisma.product.findMany({
             where: {
-                id,
-            },
-        });
-        const result = yield app_1.prisma.service.findMany({
-            where: {
-                category: {
-                    contains: category === null || category === void 0 ? void 0 : category.name,
-                    mode: "insensitive",
-                },
+                catagoeryId: id,
             },
         });
         return res.status(200).send({
@@ -72,8 +62,7 @@ const getCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -94,8 +83,7 @@ const updateCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, funct
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -117,8 +105,7 @@ const deleteCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, funct
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });

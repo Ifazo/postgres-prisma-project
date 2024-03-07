@@ -1,39 +1,13 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
-
-const createUser = async (req: Request, res: Response) => {
-  try {
-    const { email } = req.body;
-    const userExists = await prisma.user.findUnique({
-      where: { email },
-    });
-    if (userExists) {
-      return res.status(400).send({
-        success: false,
-        message: "User already exists",
-      });
-    }
-    const user = await prisma.user.create({
-      data: req.body,
-    });
-    return res.status(200).send({
-      success: true,
-      message: "User created successfully",
-      data: user,
-    });
-  } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: "Internal server error",
-      error,
-    });
-  }
-};
+import { Role } from "@prisma/client";
+import config from "../../config";
+import { JwtPayload, Secret, verify } from "jsonwebtoken";
 
 const getUsers = async (_req: Request, res: Response) => {
   try {
     const result = await prisma.user.findMany({
-      where: { role: "user" },
+      where: { role: Role.user },
     });
     return res.send({
       success: true,
@@ -44,8 +18,7 @@ const getUsers = async (_req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -53,7 +26,7 @@ const getUsers = async (_req: Request, res: Response) => {
 const getAdmins = async (_req: Request, res: Response) => {
   try {
     const result = await prisma.user.findMany({
-      where: { role: "admin" },
+      where: { role: Role.admin },
     });
     return res.send({
       success: true,
@@ -64,8 +37,7 @@ const getAdmins = async (_req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -73,22 +45,30 @@ const getAdmins = async (_req: Request, res: Response) => {
 const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const result = await prisma.user.findUnique({
-      where: {
-        id,
-      },
+    const token = req.headers.authorization as string;
+    const secret = config.jwt_secret_key as Secret;
+    const decodedToken = verify(token, secret) as JwtPayload;
+    if (decodedToken.role === Role.user) {
+      if (decodedToken.id !== id) {
+        return res.status(401).send({
+          success: false,
+          message: "Unauthorized",
+        });
+      }
+    }
+    const user = await prisma.user.findUnique({
+      where: { id },
     });
     return res.send({
       success: true,
       statusCode: 200,
       message: "User get successfully",
-      data: result,
+      data: user,
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -97,21 +77,31 @@ const updateUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const result = await prisma.user.update({
+    const token = req.headers.authorization as string;
+    const secret = config.jwt_secret_key as Secret;
+    const decodedToken = verify(token, secret) as JwtPayload;
+    if (decodedToken.role === Role.user) {
+      if (decodedToken.id !== id) {
+        return res.status(401).send({
+          success: false,
+          message: "Unauthorized",
+        });
+      }
+    }
+    const user = await prisma.user.update({
       where: { id },
       data,
     });
-    return res.send({
+    
+    return res.status(200).send({
       success: true,
-      statusCode: 200,
       message: "User updated successfully",
-      data: result,
+      data: user,
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
@@ -124,23 +114,21 @@ const deleteUserById = async (req: Request, res: Response) => {
         id,
       },
     });
-    return res.send({
+    
+    return res.status(200).send({
       success: true,
-      statusCode: 200,
       message: "User deleted successfully",
       data: result,
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
 
 export const userController = {
-  createUser,
   getUsers,
   getAdmins,
   getUserById,

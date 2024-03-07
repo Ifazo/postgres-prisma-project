@@ -32,7 +32,7 @@ const auth = (...roles) => (req, res, next) => __awaiter(void 0, void 0, void 0,
         next();
     }
     catch (error) {
-        next(error);
+        return res.status(500).json({ success: false, message: error });
     }
 });
 exports.default = auth;

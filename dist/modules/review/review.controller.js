@@ -39,8 +39,7 @@ const postReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -49,7 +48,7 @@ const getReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const { id } = req.params;
         const result = yield app_1.prisma.review.findMany({
             where: {
-                service: id,
+                productId: id,
             },
         });
         return res.send({
@@ -62,8 +61,7 @@ const getReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -87,8 +85,7 @@ const updateReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });
@@ -110,8 +107,7 @@ const deleteReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     catch (error) {
         return res.status(500).send({
             success: false,
-            message: "Internal server error",
-            error,
+            message: error,
         });
     }
 });

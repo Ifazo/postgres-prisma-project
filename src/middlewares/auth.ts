@@ -37,7 +37,7 @@ const auth =
 
       next();
     } catch (error) {
-      next(error);
+      return res.status(500).json({ success: false, message: error });
     }
   };
 

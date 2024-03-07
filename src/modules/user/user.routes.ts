@@ -6,7 +6,6 @@ import { Role } from "@prisma/client";
 const router = Router();
 
 router
-  .post("/", userController.createUser)
   .get("/", auth(Role.admin, Role.super_admin), userController.getUsers)
   .get("/admins", auth(Role.super_admin), userController.getAdmins)
   .get("/:id", auth(Role.admin, Role.super_admin), userController.getUserById)

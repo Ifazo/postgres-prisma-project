@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import config from "../../config";
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import { JwtPayload, Secret, sign, verify } from "jsonwebtoken";
 import { prisma } from "../../app";
 
-const loginUser = async (req: Request, res: Response) => {
+const signInUser = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
     const user = await prisma.user.findUnique({
@@ -22,7 +22,7 @@ const loginUser = async (req: Request, res: Response) => {
       role: user.role,
     };
     const secret = config.jwt_secret_key as Secret;
-    const token = jwt.sign(payload, secret);
+    const token = sign(payload, secret);
     req.headers.authorization = token;
     res.cookie("token", token, {
       httpOnly: true,
@@ -31,66 +31,87 @@ const loginUser = async (req: Request, res: Response) => {
     });
     return res.status(200).send({
       success: true,
-      message: "User sign-in successfully",
+      message: "Sign in user successfully",
       token: token,
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
-    });
-  }
-};
-const getProfile = async (req: Request, res: Response) => {
-  try {
-    const token = req.headers.authorization as string;
-    const secret = config.jwt_secret_key as Secret;
-    const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    const { id } = decodedToken;
-    const user = await prisma.user.findUnique({
-      where: { id },
-    });
-    return res.status(200).send({
-      success: true,
-      message: "User profile fetched successfully",
-      data: user,
-    });
-  } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
 };
 
-const updateProfile = async (req: Request, res: Response) => {
+const signUpUser = async (req: Request, res: Response) => {
   try {
-    const token = req.headers.authorization as string;
-    const secret = config.jwt_secret_key as Secret;
-    const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    const { id } = decodedToken;
-    const user = await prisma.user.update({
-      where: { id },
+    const { email } = req.body;
+    const userExists = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (userExists) {
+      return res.status(400).send({
+        success: false,
+        message: "User already exists",
+      });
+    }
+    const user = await prisma.user.create({
       data: req.body,
     });
     return res.status(200).send({
       success: true,
-      message: "User profile updated successfully",
+      message: "Sign up user successfully",
       data: user,
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Internal server error",
-      error,
+      message: error,
     });
   }
-};
+}
+
+const refreshToken = async (req: Request, res: Response) => {
+  try {
+    const token = req.headers.authorization as string;
+    const secret = config.jwt_secret_key as Secret;
+    const decodedToken = verify(token, secret) as JwtPayload;
+    const user = await prisma.user.findUnique({
+      where: { id: decodedToken.id },
+    });
+    if (!user) {
+      return res.status(400).send({
+        success: false,
+        message: "User not found!",
+      });
+    }
+    const payload = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+    const newToken = sign(payload, secret);
+    req.headers.authorization = newToken;
+    res.cookie("token", newToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    return res.status(200).send({
+      success: true,
+      message: "Refresh token successfully",
+      token: newToken,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: error,
+    });
+  }
+}
 
 export const authController = {
-  loginUser,
-  getProfile,
-  updateProfile,
+  signInUser,
+  signUpUser,
+  refreshToken,
 };

@@ -5,7 +5,7 @@ const express_1 = require("express");
 const auth_controller_1 = require("./auth.controller");
 const router = (0, express_1.Router)();
 router
-    .post("/", auth_controller_1.authController.loginUser)
-    .get("/profile", auth_controller_1.authController.getProfile)
-    .patch("/profile", auth_controller_1.authController.updateProfile);
+    .post("/sign-in", auth_controller_1.authController.signInUser)
+    .post("/sign-up", auth_controller_1.authController.signUpUser)
+    .post("/token", auth_controller_1.authController.refreshToken);
 exports.authRoutes = router;

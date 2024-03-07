@@ -9,6 +9,7 @@ const booking_routes_1 = require("../modules/booking/booking.routes");
 const auth_routes_1 = require("../modules/auth/auth.routes");
 const post_routes_1 = require("../modules/post/post.routes");
 const wishlist_routes_1 = require("../modules/wishlist/wishlist.routes");
+const product_routes_1 = require("../modules/product/product.routes");
 const router = (0, express_1.Router)();
 const routes = [
     {
@@ -22,6 +23,10 @@ const routes = [
     {
         path: "/categories",
         route: category_routes_1.categoryRoutes,
+    },
+    {
+        path: "/products",
+        route: product_routes_1.productRoutes,
     },
     {
         path: "/services",
