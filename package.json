@@ -6,11 +6,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon ./src/index.ts",
     "start": "node ./dist/index.js",
-    "build": "tsc",
     "studio": "prisma studio",
     "migrate": "prisma migrate dev",
     "deploy": "prisma migrate deploy",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "build": "npm run deploy && npm run postinstall"
   },
   "author": "",
   "license": "ISC",
@@ -29,7 +29,8 @@
     "@types/jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.0",
     "prisma": "^5.10.2",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
   },
   "keywords": [],
   "description": ""
