@@ -14,20 +14,15 @@ enum Role {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  password  String
+  id        String   @id @default(uuid())
   name      String?
   image     String?
-  role      Role       @default(user)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt()
+  email     String   @unique
+  password  String
+  role      Role     @default(user)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
   Review    Review[]
-  Wishlist  Wishlist[]
-  Order     Order[]
-  Service   Service[]
-  Booking   Booking[]
-  Post      Post[]
 
   @@map("users")
 }
@@ -50,31 +45,15 @@ model Product {
   image       String
   description String
   price       Float
+  rating      Float
   stock       Int
-  catagoeryId String   @map("catagoery_id")
-  category    Category @relation(fields: [catagoeryId], references: [id])
+  categoryId  String   @map("catagoery_id")
+  category    Category @relation(fields: [categoryId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   Review      Review[]
 
   @@map("products")
-}
-
-model Service {
-  id          String    @id @default(uuid())
-  name        String
-  image       String
-  description String
-  price       Float
-  startDate   DateTime
-  endDate     DateTime
-  userId      String    @map("user_id")
-  user        User      @relation(fields: [userId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  Booking     Booking[]
-
-  @@map("services")
 }
 
 model Review {
@@ -89,51 +68,4 @@ model Review {
   updatedAt DateTime @updatedAt
 
   @@map("reviews")
-}
-
-model Post {
-  id        String   @id @default(uuid())
-  image     String
-  title     String
-  content   String
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("posts")
-}
-
-model Wishlist {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  service   Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("wishlists")
-}
-
-model Booking {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  serviceId String   @map("service_id")
-  service   Service  @relation(fields: [serviceId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("bookings")
-}
-
-model Order {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  products  Json[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("orders")
 }

@@ -1,11 +1,11 @@
 {
   "name": "express-prisma-server",
   "version": "1.0.0",
-  "main": "./dist/server.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./src/server.ts",
-    "start": "node ./dist/server.js",
+    "dev": "nodemon ./src/index.ts",
+    "start": "node ./dist/index.js",
     "studio": "prisma studio",
     "migrate": "prisma migrate dev",
     "deploy": "prisma migrate deploy",
@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.10.2",
+    "@prisma/client": "^5.22.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -28,7 +28,7 @@
     "@types/express": "^4.17.17",
     "@types/jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.0",
-    "prisma": "^5.10.2",
+    "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
   },

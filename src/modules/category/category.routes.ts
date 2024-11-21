@@ -11,8 +11,8 @@ router
     auth(Role.admin, Role.super_admin),
     categoryController.postCategory
   )
-  .get("/", categoryController.getCategory)
-  .get("/:id", categoryController.getCategoryById)
+  .get("/", categoryController.getCategories)
+  .get("/:id", categoryController.getProductsByCategory)
   .patch(
     "/:id",
     auth(Role.admin, Role.super_admin),

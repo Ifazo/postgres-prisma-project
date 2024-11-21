@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
 import { Role } from "@prisma/client";
-import config from "../../config";
-import { JwtPayload, Secret, verify } from "jsonwebtoken";
 
 const getUsers = async (_req: Request, res: Response) => {
   try {
@@ -45,25 +43,20 @@ const getAdmins = async (_req: Request, res: Response) => {
 const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const token = req.headers.authorization as string;
-    const secret = config.jwt_secret_key as Secret;
-    const decodedToken = verify(token, secret) as JwtPayload;
-    if (decodedToken.role === Role.user) {
-      if (decodedToken.id !== id) {
-        return res.status(401).send({
-          success: false,
-          message: "Unauthorized",
-        });
-      }
-    }
-    const user = await prisma.user.findUnique({
+    const result = await prisma.user.findUnique({
       where: { id },
     });
+    if (!result) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
     return res.send({
       success: true,
       statusCode: 200,
       message: "User get successfully",
-      data: user,
+      data: result,
     });
   } catch (error) {
     return res.status(500).send({
@@ -77,26 +70,20 @@ const updateUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const token = req.headers.authorization as string;
-    const secret = config.jwt_secret_key as Secret;
-    const decodedToken = verify(token, secret) as JwtPayload;
-    if (decodedToken.role === Role.user) {
-      if (decodedToken.id !== id) {
-        return res.status(401).send({
-          success: false,
-          message: "Unauthorized",
-        });
-      }
-    }
-    const user = await prisma.user.update({
+    const result = await prisma.user.update({
       where: { id },
       data,
     });
-    
+    if (!result) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
     return res.status(200).send({
       success: true,
       message: "User updated successfully",
-      data: user,
+      data: result,
     });
   } catch (error) {
     return res.status(500).send({
@@ -114,7 +101,12 @@ const deleteUserById = async (req: Request, res: Response) => {
         id,
       },
     });
-    
+    if (!result) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
     return res.status(200).send({
       success: true,
       message: "User deleted successfully",

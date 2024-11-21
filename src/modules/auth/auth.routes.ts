@@ -6,6 +6,8 @@ const router = Router();
 router
   .post("/sign-in", authController.signInUser)
   .post("/sign-up", authController.signUpUser)
-  .post("/token", authController.refreshToken)
+  .get("/profile", authController.getUserProfile)
+  .patch("/profile", authController.updateUserProfile)
+  .delete("/profile", authController.deleteUserProfile)
 
 export const authRoutes = router;

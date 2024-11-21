@@ -3,16 +3,9 @@ import { prisma } from "../../app";
 import config from "../../config";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
-const postReview = async (req: Request, res: Response) => {
+const createReview = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    const token = req.headers.authorization as string;
-    const secret = config.jwt_secret_key as Secret;
-    const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    const { email, name, image } = decodedToken;
-    data.user = email;
-    data.name = name;
-    data.image = image;
     const result = await prisma.review.create({
       data,
     });
@@ -38,6 +31,12 @@ const getReviews = async (req: Request, res: Response) => {
         productId: id,
       },
     });
+    if (!result) {
+      return res.status(404).send({
+        success: false,
+        message: "Product of review not found",
+      });
+    }
     return res.send({
       success: true,
       statusCode: 200,
@@ -56,12 +55,40 @@ const updateReview = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const data = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: No Bearer token provided.",
+      });
+    }
+    const token = authHeader.split(" ")[1];
+    const secret = config.jwt_secret_key as Secret;
+    const decodedToken = jwt.verify(token, secret) as JwtPayload;
+    const { id: user } = decodedToken;
+    const review = await prisma.review.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (review?.userId !== user) {
+      return res.status(403).send({
+        success: false,
+        message: "You are not owner to update this review",
+      });
+    }
     const result = await prisma.review.update({
       where: {
         id,
       },
       data,
     });
+    if (!result) {
+      return res.status(404).send({
+        success: false,
+        message: "Review not found",
+      });
+    }
     return res.send({
       success: true,
       statusCode: 200,
@@ -79,11 +106,39 @@ const updateReview = async (req: Request, res: Response) => {
 const deleteReview = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: No Bearer token provided.",
+      });
+    }
+    const token = authHeader.split(" ")[1];
+    const secret = config.jwt_secret_key as Secret;
+    const decodedToken = jwt.verify(token, secret) as JwtPayload;
+    const { id: user } = decodedToken;
+    const review = await prisma.review.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (review?.userId !== user) {
+      return res.status(403).send({
+        success: false,
+        message: "You are not owner to update this review",
+      });
+    }
     const result = await prisma.review.delete({
       where: {
         id,
       },
     });
+    if (!result) {
+      return res.status(404).send({
+        success: false,
+        message: "Review not found",
+      });
+    }
     return res.send({
       success: true,
       statusCode: 200,
@@ -99,7 +154,7 @@ const deleteReview = async (req: Request, res: Response) => {
 };
 
 export const reviewController = {
-  postReview,
+  createReview,
   getReviews,
   updateReview,
   deleteReview,

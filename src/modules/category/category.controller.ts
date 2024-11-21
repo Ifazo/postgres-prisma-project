@@ -3,9 +3,20 @@ import { prisma } from "../../app";
 
 const postCategory = async (req: Request, res: Response) => {
   try {
+    const { name } = req.body;
+    const categoryExists = await prisma.category.findUnique({
+      where: { name },
+    });
+    if (categoryExists) {
+      return res.status(400).send({
+        success: false,
+        message: "Category already exists",
+      });
+    }
     const result = await prisma.category.create({
       data: req.body,
     });
+    
     return res.status(200).send({
       success: true,
       message: "Category created successfully",
@@ -19,7 +30,7 @@ const postCategory = async (req: Request, res: Response) => {
   }
 };
 
-const getCategory = async (req: Request, res: Response) => {
+const getCategories = async (req: Request, res: Response) => {
   try {
     const result = await prisma.category.findMany();
     return res.status(200).send({
@@ -35,17 +46,17 @@ const getCategory = async (req: Request, res: Response) => {
   }
 };
 
-const getCategoryById = async (req: Request, res: Response) => {
+const getProductsByCategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const result = await prisma.product.findMany({
       where: {
-        catagoeryId: id,
+        categoryId: id,
       },
     });
     return res.status(200).send({
       success: true,
-      message: "Category get successfully",
+      message: "Category products get successfully",
       data: result,
     });
   } catch (error) {
@@ -63,6 +74,12 @@ const updateCategoryById = async (req: Request, res: Response) => {
       where: { id },
       data: req.body,
     });
+    if (!result) {
+      return res.status(404).send({
+        success: false,
+        message: "Category not found",
+      });
+    }
     return res.send({
       success: true,
       statusCode: 200,
@@ -85,6 +102,12 @@ const deleteCategoryById = async (req: Request, res: Response) => {
         id,
       },
     });
+    if (!result) {
+      return res.status(404).send({
+        success: false,
+        message: "Category not found",
+      });
+    }
     return res.send({
       success: true,
       statusCode: 200,
@@ -101,8 +124,8 @@ const deleteCategoryById = async (req: Request, res: Response) => {
 
 export const categoryController = {
   postCategory,
-  getCategory,
-  getCategoryById,
+  getCategories,
+  getProductsByCategory,
   updateCategoryById,
   deleteCategoryById,
 };

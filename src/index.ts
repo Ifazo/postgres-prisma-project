@@ -3,11 +3,11 @@ import config from "./config";
 
 async function main() {
   app.get("/", (_req, res) => {
-    res.send("Hello from Prisma World!");
+    res.send("Welcome to express prisma server!");
   });
 
   app.get("/api", (_req, res) => {
-    res.send("Express server api running successfully!");
+    res.send("Server api running successfully!");
   });
 
   const port = config.port;

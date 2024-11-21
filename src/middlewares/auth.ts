@@ -14,13 +14,15 @@ const auth =
   (...roles: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const token = req.headers.authorization;
+      const authHeader = req.headers.authorization;
 
-      if (!token) {
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return res
           .status(401)
-          .json({ success: false, message: "You are unauthorized" });
+          .json({ success: false, message: "You are unauthorized; Token not provided or invalid format." });
       }
+
+      const token = authHeader.split(" ")[1];
 
       const verifiedUser = jwt.verify(
         token,
@@ -31,7 +33,7 @@ const auth =
 
       if (roles.length && !roles.includes(verifiedUser.role)) {
         return res
-          .status(401)
+          .status(403)
           .json({ success: false, message: "Forbidden user" });
       }
 
