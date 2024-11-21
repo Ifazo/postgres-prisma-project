@@ -16,7 +16,7 @@ const postCategory = async (req: Request, res: Response) => {
     const result = await prisma.category.create({
       data: req.body,
     });
-    
+
     return res.status(200).send({
       success: true,
       message: "Category created successfully",

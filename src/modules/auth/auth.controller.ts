@@ -85,7 +85,7 @@ const signUpUser = async (req: Request, res: Response) => {
 const getUserProfile = async (req: Request, res: Response) => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
@@ -111,13 +111,13 @@ const getUserProfile = async (req: Request, res: Response) => {
       message: error,
     });
   }
-}
+};
 
 const updateUserProfile = async (req: Request, res: Response) => {
   try {
     const data = req.body;
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
@@ -143,12 +143,12 @@ const updateUserProfile = async (req: Request, res: Response) => {
       message: error,
     });
   }
-}
+};
 
 const deleteUserProfile = async (req: Request, res: Response) => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
@@ -173,7 +173,7 @@ const deleteUserProfile = async (req: Request, res: Response) => {
       message: error,
     });
   }
-}
+};
 
 export const authController = {
   signInUser,

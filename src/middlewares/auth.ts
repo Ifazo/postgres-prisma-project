@@ -17,16 +17,18 @@ const auth =
       const authHeader = req.headers.authorization;
 
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res
-          .status(401)
-          .json({ success: false, message: "You are unauthorized; Token not provided or invalid format." });
+        return res.status(401).json({
+          success: false,
+          message:
+            "You are unauthorized; Token not provided or invalid format.",
+        });
       }
 
       const token = authHeader.split(" ")[1];
 
       const verifiedUser = jwt.verify(
         token,
-        config.jwt_secret_key as Secret
+        config.jwt_secret_key as Secret,
       ) as JwtPayload;
 
       req.user = verifiedUser;

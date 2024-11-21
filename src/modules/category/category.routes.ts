@@ -9,19 +9,19 @@ router
   .post(
     "/",
     auth(Role.admin, Role.super_admin),
-    categoryController.postCategory
+    categoryController.postCategory,
   )
   .get("/", categoryController.getCategories)
   .get("/:id", categoryController.getProductsByCategory)
   .patch(
     "/:id",
     auth(Role.admin, Role.super_admin),
-    categoryController.updateCategoryById
+    categoryController.updateCategoryById,
   )
   .delete(
     "/:id",
     auth(Role.admin, Role.super_admin),
-    categoryController.deleteCategoryById
+    categoryController.deleteCategoryById,
   );
 
 export const categoryRoutes = router;

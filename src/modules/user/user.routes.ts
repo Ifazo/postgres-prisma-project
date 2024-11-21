@@ -12,12 +12,12 @@ router
   .patch(
     "/:id",
     auth(Role.admin, Role.super_admin),
-    userController.updateUserById
+    userController.updateUserById,
   )
   .delete(
     "/:id",
     auth(Role.admin, Role.super_admin),
-    userController.deleteUserById
+    userController.deleteUserById,
   );
 
 export const userRoutes = router;

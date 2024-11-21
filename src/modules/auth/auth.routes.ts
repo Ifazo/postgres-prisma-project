@@ -8,6 +8,6 @@ router
   .post("/sign-up", authController.signUpUser)
   .get("/profile", authController.getUserProfile)
   .patch("/profile", authController.updateUserProfile)
-  .delete("/profile", authController.deleteUserProfile)
+  .delete("/profile", authController.deleteUserProfile);
 
 export const authRoutes = router;
