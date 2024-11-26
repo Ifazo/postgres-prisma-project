@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-import config from "../config";
 
 declare global {
   namespace Express {
@@ -28,7 +27,7 @@ const auth =
 
       const verifiedUser = jwt.verify(
         token,
-        config.jwt_secret_key as Secret,
+        process.env.JWT_SECRET_KEY as Secret
       ) as JwtPayload;
 
       req.user = verifiedUser;

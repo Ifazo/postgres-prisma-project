@@ -1,5 +1,9 @@
 import app from "./app";
-import config from "./config";
+import dotenv from "dotenv";
+
+dotenv.config()
+
+const port = 5000
 
 async function main() {
   app.get("/", (_req, res) => {
@@ -7,10 +11,9 @@ async function main() {
   });
 
   app.get("/api", (_req, res) => {
-    res.send("Server api running successfully!");
+    res.send("Server api is running successfully!");
   });
 
-  const port = config.port;
   app.listen(port, () => console.log(`🚀 Server ready at Port: ${port} ⭐️`));
 }
 

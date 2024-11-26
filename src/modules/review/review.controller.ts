@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
-import config from "../../config";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
 const createReview = async (req: Request, res: Response) => {
@@ -63,7 +62,7 @@ const updateReview = async (req: Request, res: Response) => {
       });
     }
     const token = authHeader.split(" ")[1];
-    const secret = config.jwt_secret_key as Secret;
+    const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
     const { id: user } = decodedToken;
     const review = await prisma.review.findUnique({
@@ -114,7 +113,7 @@ const deleteReview = async (req: Request, res: Response) => {
       });
     }
     const token = authHeader.split(" ")[1];
-    const secret = config.jwt_secret_key as Secret;
+    const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
     const { id: user } = decodedToken;
     const review = await prisma.review.findUnique({

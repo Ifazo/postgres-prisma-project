@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import config from "../../config";
 import { JwtPayload, Secret, sign, verify } from "jsonwebtoken";
 import { prisma } from "../../app";
 import bcrypt from "bcrypt";
@@ -32,7 +31,7 @@ const signInUser = async (req: Request, res: Response) => {
       email: user.email,
       role: user.role,
     };
-    const secret = config.jwt_secret_key as Secret;
+    const secret = process.env.JWT_SECRET_KEY as Secret;
     const token = sign(payload, secret, { expiresIn: "24h" });
     req.headers.authorization = token;
 
@@ -94,7 +93,7 @@ const getUserProfile = async (req: Request, res: Response) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const secret = config.jwt_secret_key as Secret;
+    const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = verify(token, secret) as JwtPayload;
     const user = await prisma.user.findUnique({
       where: { id: decodedToken.id },
@@ -126,7 +125,7 @@ const updateUserProfile = async (req: Request, res: Response) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const secret = config.jwt_secret_key as Secret;
+    const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = verify(token, secret) as JwtPayload;
     const user = await prisma.user.update({
       where: { id: decodedToken.id },
@@ -157,7 +156,7 @@ const deleteUserProfile = async (req: Request, res: Response) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const secret = config.jwt_secret_key as Secret;
+    const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = verify(token, secret) as JwtPayload;
     const user = await prisma.user.delete({
       where: { id: decodedToken.id },
