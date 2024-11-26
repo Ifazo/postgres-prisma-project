@@ -1,4 +1,4 @@
-# Express Mongoose Server
+# Express Prisma Server
 
 This project is an Express.js server integrated with Prisma ORM for postgreSQL database operations. It provides a backend for your application with user authentication and data storage capabilities.
 
