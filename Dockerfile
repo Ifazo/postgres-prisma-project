@@ -10,20 +10,17 @@ COPY package*.json ./
 # Copy Prisma schema before installing dependencies
 COPY prisma ./prisma
 
-# Install dependencies
-RUN npm install --omit=dev --ignore-scripts
+# Install all dependencies (both prod and dev)
+RUN npm install --ignore-scripts
 
 # Copy the rest of the application files
 COPY . .
 
-# Install TypeScript if not installed via package.json
-RUN npm install typescript --save-dev
+# Run Prisma migrations and generate client after install
+RUN npm run deploy && npm run generate
 
 # Build TypeScript project (creates `dist/` folder)
 RUN npm run build
-
-# Generate Prisma client
-RUN npx prisma generate
 
 # Expose the port
 EXPOSE 3000
