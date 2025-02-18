@@ -19,11 +19,11 @@ RUN npm install --ignore-scripts
 # Copy the rest of the application files
 COPY . .
 
-# Build TypeScript project (creates `dist/` folder)
-RUN npm run build
-
 # Run Prisma migrations and generate client after install
 RUN npm run deploy && npm run generate
+
+# Build TypeScript project (creates `dist/` folder)
+RUN npm run build
 
 # Expose the port
 EXPOSE 3000

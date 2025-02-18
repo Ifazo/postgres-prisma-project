@@ -6,7 +6,9 @@ dotenv.config()
 
 const port = 3000
 
-export const redis = createClient();
+export const redis = createClient({
+  url: "redis://redis:6379",
+});
 
 redis.on('error', err => console.log('Redis Client Error', err));
 
