@@ -7,11 +7,8 @@ WORKDIR /app
 # Copy package.json and package-lock.json first (for better caching)
 COPY package*.json ./
 
-# Copy Prisma schema before installing dependencies
-COPY prisma ./prisma
-
 # Install all dependencies (both prod and dev)
-RUN npm install --ignore-scripts
+RUN npm install
 
 # Copy the rest of the application files
 COPY . .
