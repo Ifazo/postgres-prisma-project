@@ -16,6 +16,9 @@ RUN npm install --omit=dev --ignore-scripts
 # Copy the rest of the application files
 COPY . .
 
+# Install TypeScript if not installed via package.json
+RUN npm install typescript --save-dev
+
 # Build TypeScript project (creates `dist/` folder)
 RUN npm run build
 
