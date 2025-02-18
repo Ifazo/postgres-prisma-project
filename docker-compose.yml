@@ -11,6 +11,8 @@ services:
       - redis
     environment:
       - REDIS_URL=redis://redis:6379  # Connect to Redis container using 'redis' hostname
+    env_file:
+      - .env  # Load environment variables from .env file
     networks:
       - app-network
 
