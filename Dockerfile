@@ -13,6 +13,9 @@ RUN npm install --ignore-scripts
 # Copy the rest of the application files
 COPY . .
 
+# Copy the .env file
+COPY .env .env
+
 # Run Prisma migrations and generate client after install
 RUN npm run deploy && npm run generate
 
