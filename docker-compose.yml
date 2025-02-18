@@ -9,6 +9,8 @@ services:
       - "3000:3000"  # Expose Node.js app to port 3000 on host
     depends_on:
       - redis
+    environment:
+      - REDIS_URL=redis://redis:6379 
     env_file:
       - .env  # Load environment variables from .env file
     networks:

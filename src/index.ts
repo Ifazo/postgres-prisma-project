@@ -6,13 +6,23 @@ dotenv.config()
 
 const port = 3000
 
-export const redis = createClient();
+export const redis = createClient({
+  url: "redis://redis:6379",
+});
 
-redis.on('error', err => console.log('Redis Client Error', err));
+redis.on('error', (err) => {
+  console.error('Redis Client Error:', err);
+});
+
+redis.connect()
+  .then(() => {
+    console.log('Connected to Redis');
+  })
+  .catch((err) => {
+    console.error('Failed to connect to Redis:', err);
+  });
 
 async function main() {
-  await redis.connect();
-
   app.get("/", (_req, res) => {
     res.send("Welcome to Express Server!");
   });
