@@ -1,12 +1,24 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
 import { Role } from "@prisma/client";
+import { redis } from "../..";
 
 const getUsers = async (_req: Request, res: Response) => {
   try {
+    const cacheKey = "users";
+    const cachedUsers = await redis.get(cacheKey);
+
+    if (cachedUsers) {
+      return res.status(200).send({
+        success: true,
+        message: "Users retrieved from cache successfully",
+        data: JSON.parse(cachedUsers),
+      });
+    }
     const result = await prisma.user.findMany({
       where: { role: Role.user },
     });
+    await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
     return res.send({
       success: true,
       statusCode: 200,
@@ -23,9 +35,20 @@ const getUsers = async (_req: Request, res: Response) => {
 
 const getAdmins = async (_req: Request, res: Response) => {
   try {
+    const cacheKey = "admins";
+    const cachedAdmins = await redis.get(cacheKey);
+
+    if (cachedAdmins) {
+      return res.status(200).send({
+        success: true,
+        message: "Admins retrieved from cache successfully",
+        data: JSON.parse(cachedAdmins),
+      });
+    }
     const result = await prisma.user.findMany({
       where: { role: Role.admin },
     });
+    await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
     return res.send({
       success: true,
       statusCode: 200,
@@ -43,6 +66,16 @@ const getAdmins = async (_req: Request, res: Response) => {
 const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const cacheKey = `user:${id}`;
+    const cachedUser = await redis.get(cacheKey);
+
+    if (cachedUser) {
+      return res.status(200).send({
+        success: true,
+        message: "User retrieved from cache successfully",
+        data: JSON.parse(cachedUser),
+      });
+    }
     const result = await prisma.user.findUnique({
       where: { id },
     });
@@ -52,6 +85,7 @@ const getUserById = async (req: Request, res: Response) => {
         message: "User not found",
       });
     }
+    await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
     return res.send({
       success: true,
       statusCode: 200,
@@ -80,6 +114,8 @@ const updateUserById = async (req: Request, res: Response) => {
         message: "User not found",
       });
     }
+    await redis.del(`user:${id}`);
+    await redis.del("users");
     return res.status(200).send({
       success: true,
       message: "User updated successfully",
@@ -107,6 +143,8 @@ const deleteUserById = async (req: Request, res: Response) => {
         message: "User not found",
       });
     }
+    await redis.del(`user:${id}`);
+    await redis.del("users");
     return res.status(200).send({
       success: true,
       message: "User deleted successfully",

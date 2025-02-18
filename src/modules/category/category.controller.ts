@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
+import { redis } from "../..";
 
 const postCategory = async (req: Request, res: Response) => {
   try {
@@ -16,7 +17,7 @@ const postCategory = async (req: Request, res: Response) => {
     const result = await prisma.category.create({
       data: req.body,
     });
-
+    await redis.del("categories");
     return res.status(200).send({
       success: true,
       message: "Category created successfully",
@@ -32,7 +33,19 @@ const postCategory = async (req: Request, res: Response) => {
 
 const getCategories = async (req: Request, res: Response) => {
   try {
+    const cacheKey = "categories";
+    const cachedCategories = await redis.get(cacheKey);
+
+    if (cachedCategories) {
+      return res.status(200).send({
+        success: true,
+        message: "Categories retrieved from cache successfully",
+        data: JSON.parse(cachedCategories),
+      });
+    }
+
     const result = await prisma.category.findMany();
+    await redis.set(cacheKey, JSON.stringify(result));
     return res.status(200).send({
       success: true,
       message: "Categories get successfully",
@@ -49,11 +62,22 @@ const getCategories = async (req: Request, res: Response) => {
 const getProductsByCategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const cacheKey = `category:${id}:products`;
+    const cachedProducts = await redis.get(cacheKey);
+
+    if (cachedProducts) {
+      return res.status(200).send({
+        success: true,
+        message: "Category products retrieved from cache successfully",
+        data: JSON.parse(cachedProducts),
+      });
+    }
     const result = await prisma.product.findMany({
       where: {
         categoryId: id,
       },
     });
+    await redis.set(cacheKey, JSON.stringify(result));
     return res.status(200).send({
       success: true,
       message: "Category products get successfully",
@@ -80,6 +104,8 @@ const updateCategoryById = async (req: Request, res: Response) => {
         message: "Category not found",
       });
     }
+    await redis.del(`category:${id}`);
+    await redis.del("categories");
     return res.send({
       success: true,
       statusCode: 200,
@@ -108,6 +134,8 @@ const deleteCategoryById = async (req: Request, res: Response) => {
         message: "Category not found",
       });
     }
+    await redis.del(`category:${id}`);
+    await redis.del("categories");
     return res.send({
       success: true,
       statusCode: 200,

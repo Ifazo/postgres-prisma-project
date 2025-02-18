@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import { redis } from "../..";
 
 const createReview = async (req: Request, res: Response) => {
   try {
@@ -8,6 +9,7 @@ const createReview = async (req: Request, res: Response) => {
     const result = await prisma.review.create({
       data,
     });
+    await redis.del("reviews");
     return res.send({
       success: true,
       statusCode: 200,
@@ -25,6 +27,16 @@ const createReview = async (req: Request, res: Response) => {
 const getReviews = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const cacheKey = `reviews:${id}`;
+    const cachedReviews = await redis.get(cacheKey);
+
+    if (cachedReviews) {
+      return res.status(200).send({
+        success: true,
+        message: "Reviews retrieved from cache successfully",
+        data: JSON.parse(cachedReviews),
+      });
+    }
     const result = await prisma.review.findMany({
       where: {
         productId: id,
@@ -36,6 +48,7 @@ const getReviews = async (req: Request, res: Response) => {
         message: "Product of review not found",
       });
     }
+    await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
     return res.send({
       success: true,
       statusCode: 200,
@@ -88,6 +101,7 @@ const updateReview = async (req: Request, res: Response) => {
         message: "Review not found",
       });
     }
+    await redis.del(`reviews:${id}`);
     return res.send({
       success: true,
       statusCode: 200,
@@ -138,6 +152,7 @@ const deleteReview = async (req: Request, res: Response) => {
         message: "Review not found",
       });
     }
+    await redis.del(`reviews:${id}`);
     return res.send({
       success: true,
       statusCode: 200,
