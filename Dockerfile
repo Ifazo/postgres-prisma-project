@@ -7,9 +7,6 @@ WORKDIR /app
 # Copy package.json and package-lock.json first (for better caching)
 COPY package*.json ./
 
-# Copy the .env file into the container
-COPY .env .env
-
 # Copy Prisma schema before installing dependencies
 COPY prisma ./prisma
 
