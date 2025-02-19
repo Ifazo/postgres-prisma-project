@@ -1,6 +1,9 @@
 # Use an official Node.js image
 FROM node:22
 
+# Install Redis and Supervisor
+RUN apt-get update && apt-get install -y redis-server supervisor && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -22,8 +25,11 @@ RUN npm run deploy && npm run generate
 # Build TypeScript project (creates `dist/` folder)
 RUN npm run build
 
-# Expose the port
-EXPOSE 3000
+# Copy Supervisor configuration
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Start the server
-CMD ["npm", "start"]
+# Expose the port
+EXPOSE 3000 6379
+
+# Start both Redis and the Node.js app using Supervisor
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
