@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { JwtPayload, Secret, sign, verify } from "jsonwebtoken";
 import { prisma } from "../../app";
 import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const signInUser = async (req: Request, res: Response) => {
   try {

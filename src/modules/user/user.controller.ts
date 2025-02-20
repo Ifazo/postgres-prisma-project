@@ -11,7 +11,7 @@ const getUsers = async (_req: Request, res: Response) => {
     if (cachedUsers) {
       return res.status(200).send({
         success: true,
-        message: "Users retrieved from cache successfully",
+        message: "Users retrieved from redis cache successfully",
         data: JSON.parse(cachedUsers),
       });
     }
@@ -41,7 +41,7 @@ const getAdmins = async (_req: Request, res: Response) => {
     if (cachedAdmins) {
       return res.status(200).send({
         success: true,
-        message: "Admins retrieved from cache successfully",
+        message: "Admins retrieved from redis cache successfully",
         data: JSON.parse(cachedAdmins),
       });
     }
@@ -72,7 +72,7 @@ const getUserById = async (req: Request, res: Response) => {
     if (cachedUser) {
       return res.status(200).send({
         success: true,
-        message: "User retrieved from cache successfully",
+        message: "User retrieved from redis cache successfully",
         data: JSON.parse(cachedUser),
       });
     }

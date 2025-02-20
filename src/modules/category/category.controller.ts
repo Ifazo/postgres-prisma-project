@@ -39,13 +39,13 @@ const getCategories = async (req: Request, res: Response) => {
     if (cachedCategories) {
       return res.status(200).send({
         success: true,
-        message: "Categories retrieved from cache successfully",
+        message: "Categories retrieved from redis cache successfully",
         data: JSON.parse(cachedCategories),
       });
     }
 
     const result = await prisma.category.findMany();
-    await redis.set(cacheKey, JSON.stringify(result));
+    await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
     return res.status(200).send({
       success: true,
       message: "Categories get successfully",
@@ -68,7 +68,7 @@ const getProductsByCategory = async (req: Request, res: Response) => {
     if (cachedProducts) {
       return res.status(200).send({
         success: true,
-        message: "Category products retrieved from cache successfully",
+        message: "Category products retrieved from redis cache successfully",
         data: JSON.parse(cachedProducts),
       });
     }
@@ -77,7 +77,7 @@ const getProductsByCategory = async (req: Request, res: Response) => {
         categoryId: id,
       },
     });
-    await redis.set(cacheKey, JSON.stringify(result));
+    await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
     return res.status(200).send({
       success: true,
       message: "Category products get successfully",

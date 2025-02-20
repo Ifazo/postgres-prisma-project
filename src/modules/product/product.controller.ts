@@ -30,7 +30,7 @@ const getProducts = async (req: Request, res: Response) => {
     if (cachedProducts) {
       return res.status(200).send({
         success: true,
-        message: "Products retrieved from cache successfully",
+        message: "Products retrieved from redis cache successfully",
         data: JSON.parse(cachedProducts),
       });
     }
@@ -89,7 +89,7 @@ const getProductById = async (req: Request, res: Response) => {
     if (cachedProduct) {
       return res.status(200).send({
         success: true,
-        message: "Product retrieved from cache successfully",
+        message: "Product retrieved from redis cache successfully",
         data: JSON.parse(cachedProduct),
       });
     }

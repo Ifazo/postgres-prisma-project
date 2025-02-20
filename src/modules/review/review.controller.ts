@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { prisma } from "../../app";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { redis } from "../..";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const createReview = async (req: Request, res: Response) => {
   try {
@@ -33,7 +36,7 @@ const getReviews = async (req: Request, res: Response) => {
     if (cachedReviews) {
       return res.status(200).send({
         success: true,
-        message: "Reviews retrieved from cache successfully",
+        message: "Reviews retrieved from redis cache successfully",
         data: JSON.parse(cachedReviews),
       });
     }
