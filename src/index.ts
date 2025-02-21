@@ -4,7 +4,7 @@ import { createClient } from "redis";
 
 dotenv.config();
 
-const port = 3000;
+const port = 8000;
 
 export const redis = createClient();
 
@@ -30,6 +30,14 @@ async function main() {
     res.send("Server API is running successfully!");
   });
 
+  app.get("/success", (_req, res) => {
+    res.send("Payment successful!");
+  });
+
+  app.get("/cancel", (_req, res) => {
+    res.send("Payment cancelled!");
+  });
+
   app.get("/redis", async (_req, res) => {
     await redis.set("key", "Hello from Redis");
     const value = await redis.get("key");
@@ -39,7 +47,7 @@ async function main() {
     });
   });
 
-  app.listen(port, () => console.log(`🚀 Server ready at Port: ${port} ⭐️`));
+  app.listen(port, () => console.log(`🚀 Server running at: http://localhost:${port}`));
 }
 
 main();

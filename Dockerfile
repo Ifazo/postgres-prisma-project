@@ -29,7 +29,7 @@ RUN npm run build
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Expose the port
-EXPOSE 3000 6379
+EXPOSE 8000 6379
 
 # Start both Redis and the Node.js app using Supervisor
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

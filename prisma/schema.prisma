@@ -13,6 +13,14 @@ enum Role {
   super_admin
 }
 
+enum OrderStatus {
+  pending
+  processing
+  shipped
+  delivered
+  cancelled
+}
+
 model User {
   id        String   @id @default(uuid())
   name      String?
@@ -22,7 +30,8 @@ model User {
   role      Role     @default(user)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
-  Review    Review[]
+  reviews   Review[]
+  orders    Order[]
 
   @@map("users")
 }
@@ -34,7 +43,7 @@ model Category {
   description String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  Product     Product[]
+  products    Product[]
 
   @@map("categories")
 }
@@ -51,7 +60,7 @@ model Product {
   category    Category @relation(fields: [categoryId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  Review      Review[]
+  reviews     Review[]
 
   @@map("products")
 }
@@ -68,4 +77,17 @@ model Review {
   updatedAt DateTime @updatedAt
 
   @@map("reviews")
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  userName  String?     @map("user_name")
+  userEmail String      @map("user_email")
+  user      User        @relation(fields: [userEmail], references: [email])
+  products  Json[]
+  total     Float
+  sessionId String      @map("session_id")
+  status    OrderStatus @default(pending)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
