@@ -18,7 +18,7 @@ const postCategory = async (req: Request, res: Response) => {
       data: req.body,
     });
     await redis.del("categories");
-    return res.status(200).send({
+    return res.status(201).send({
       success: true,
       message: "Category created successfully",
       data: result,

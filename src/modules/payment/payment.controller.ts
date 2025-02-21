@@ -75,7 +75,7 @@ const createPayment = async (req: Request, res: Response) => {
         status: "pending",
       }
     });
-    return res.status(200).send({
+    return res.status(201).send({
       success: true,
       message: "Payment session created successfully.",
       userName: name,

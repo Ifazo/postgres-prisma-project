@@ -1,24 +1,25 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
-import { Role } from "@prisma/client";
-import { redis } from "../..";
+import { UserRole } from "@prisma/client";
+import { JwtPayload, Secret, verify } from "jsonwebtoken";
+import dotenv from "dotenv";
 
-const getUsers = async (_req: Request, res: Response) => {
+dotenv.config();
+
+const getUsers = async (req: Request, res: Response) => {
   try {
-    const cacheKey = "users";
-    const cachedUsers = await redis.get(cacheKey);
-
-    if (cachedUsers) {
-      return res.status(200).send({
-        success: true,
-        message: "Users retrieved from redis cache successfully",
-        data: JSON.parse(cachedUsers),
+    const { role } = req.query;
+    if (!role) {
+      return res.status(400).send({
+        success: false,
+        message: "Role is required",
       });
     }
     const result = await prisma.user.findMany({
-      where: { role: Role.user },
+      where: {
+        role: role as UserRole,
+      },
     });
-    await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
     return res.send({
       success: true,
       statusCode: 200,
@@ -33,47 +34,23 @@ const getUsers = async (_req: Request, res: Response) => {
   }
 };
 
-const getAdmins = async (_req: Request, res: Response) => {
-  try {
-    const cacheKey = "admins";
-    const cachedAdmins = await redis.get(cacheKey);
-
-    if (cachedAdmins) {
-      return res.status(200).send({
-        success: true,
-        message: "Admins retrieved from redis cache successfully",
-        data: JSON.parse(cachedAdmins),
-      });
-    }
-    const result = await prisma.user.findMany({
-      where: { role: Role.admin },
-    });
-    await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
-    return res.send({
-      success: true,
-      statusCode: 200,
-      message: "Admin get successfully",
-      data: result,
-    });
-  } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: error,
-    });
-  }
-};
-
 const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const cacheKey = `user:${id}`;
-    const cachedUser = await redis.get(cacheKey);
-
-    if (cachedUser) {
-      return res.status(200).send({
-        success: true,
-        message: "User retrieved from redis cache successfully",
-        data: JSON.parse(cachedUser),
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: No Bearer token provided.",
+      });
+    }
+    const token = authHeader.split(" ")[1];
+    const secret = process.env.JWT_SECRET_KEY as Secret;
+    const decodedToken = verify(token, secret) as JwtPayload;
+    if (decodedToken.role !== "admin" && decodedToken.id !== id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: You are not allowed to access this resource.",
       });
     }
     const result = await prisma.user.findUnique({
@@ -85,7 +62,6 @@ const getUserById = async (req: Request, res: Response) => {
         message: "User not found",
       });
     }
-    await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
     return res.send({
       success: true,
       statusCode: 200,
@@ -104,20 +80,29 @@ const updateUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const data = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: No Bearer token provided.",
+      });
+    }
+    const token = authHeader.split(" ")[1];
+    const secret = process.env.JWT_SECRET_KEY as Secret;
+    const decodedToken = verify(token, secret) as JwtPayload;
+    if (decodedToken.role !== "admin" && decodedToken.id !== id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: You are not allowed to access this resource.",
+      });
+    }
     const result = await prisma.user.update({
       where: { id },
       data,
     });
-    if (!result) {
-      return res.status(404).send({
-        success: false,
-        message: "User not found",
-      });
-    }
-    await redis.del(`user:${id}`);
-    await redis.del("users");
-    return res.status(200).send({
+    return res.send({
       success: true,
+      statusCode: 200,
       message: "User updated successfully",
       data: result,
     });
@@ -127,28 +112,34 @@ const updateUserById = async (req: Request, res: Response) => {
       message: error,
     });
   }
-};
+}
 
 const deleteUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const result = await prisma.user.delete({
-      where: {
-        id,
-      },
-    });
-    if (!result) {
-      return res.status(404).send({
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
         success: false,
-        message: "User not found",
+        message: "Unauthorized: No Bearer token provided.",
       });
     }
-    await redis.del(`user:${id}`);
-    await redis.del("users");
-    return res.status(200).send({
+    const token = authHeader.split(" ")[1];
+    const secret = process.env.JWT_SECRET_KEY as Secret;
+    const decodedToken = verify(token, secret) as JwtPayload;
+    if (decodedToken.role !== "admin" && decodedToken.id !== id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: You are not allowed to access this resource.",
+      });
+    }
+    await prisma.user.delete({
+      where: { id },
+    });
+    return res.send({
       success: true,
+      statusCode: 200,
       message: "User deleted successfully",
-      data: result,
     });
   } catch (error) {
     return res.status(500).send({
@@ -156,11 +147,10 @@ const deleteUserById = async (req: Request, res: Response) => {
       message: error,
     });
   }
-};
+}
 
 export const userController = {
   getUsers,
-  getAdmins,
   getUserById,
   updateUserById,
   deleteUserById,

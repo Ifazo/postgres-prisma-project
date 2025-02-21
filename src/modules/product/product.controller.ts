@@ -8,7 +8,7 @@ const createProduct = async (req: Request, res: Response) => {
       data: req.body,
     });
     await redis.del("products");
-    return res.status(200).send({
+    return res.status(201).send({
       success: true,
       message: "Product created successfully",
       data: result,

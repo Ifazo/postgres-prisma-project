@@ -15,7 +15,7 @@ const createReview = async (req: Request, res: Response) => {
     await redis.del("reviews");
     return res.send({
       success: true,
-      statusCode: 200,
+      statusCode: 201,
       message: "Review created successfully",
       data: result,
     });
@@ -29,10 +29,15 @@ const createReview = async (req: Request, res: Response) => {
 
 const getReviews = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
+    if (!id) {
+      return res.status(400).send({
+        success: false,
+        message: "Product id is required",
+      });
+    }
     const cacheKey = `reviews:${id}`;
     const cachedReviews = await redis.get(cacheKey);
-
     if (cachedReviews) {
       return res.status(200).send({
         success: true,
@@ -42,7 +47,7 @@ const getReviews = async (req: Request, res: Response) => {
     }
     const result = await prisma.review.findMany({
       where: {
-        productId: id,
+        productId: id as string,
       },
     });
     if (!result) {
