@@ -35,7 +35,6 @@ const getCategories = async (req: Request, res: Response) => {
   try {
     const cacheKey = "categories";
     const cachedCategories = await redis.get(cacheKey);
-
     if (cachedCategories) {
       return res.status(200).send({
         success: true,
@@ -43,7 +42,6 @@ const getCategories = async (req: Request, res: Response) => {
         data: JSON.parse(cachedCategories),
       });
     }
-
     const result = await prisma.category.findMany();
     await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
     return res.status(200).send({
@@ -59,31 +57,37 @@ const getCategories = async (req: Request, res: Response) => {
   }
 };
 
-const getProductsByCategory = async (req: Request, res: Response) => {
+const getCategoryById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const cacheKey = `category:${id}:products`;
-    const cachedProducts = await redis.get(cacheKey);
-
-    if (cachedProducts) {
+    const cacheKey = `category:${id}`;
+    const cachedCategory = await redis.get(cacheKey);
+    if (cachedCategory) {
       return res.status(200).send({
         success: true,
-        message: "Category products retrieved from redis cache successfully",
-        data: JSON.parse(cachedProducts),
+        message: "Category retrieved from redis cache successfully",
+        data: JSON.parse(cachedCategory),
       });
     }
-    const result = await prisma.product.findMany({
+    const result = await prisma.category.findUnique({
       where: {
-        categoryId: id,
+        id,
       },
     });
+    if (!result) {
+      return res.status(404).send({
+        success: false,
+        message: "Category not found",
+      });
+    }
     await redis.set(cacheKey, JSON.stringify(result), { EX: 3600 });
     return res.status(200).send({
       success: true,
-      message: "Category products get successfully",
+      message: "Category get successfully",
       data: result,
     });
-  } catch (error) {
+  }
+  catch (error) {
     return res.status(500).send({
       success: false,
       message: error,
@@ -153,7 +157,7 @@ const deleteCategoryById = async (req: Request, res: Response) => {
 export const categoryController = {
   postCategory,
   getCategories,
-  getProductsByCategory,
+  getCategoryById,
   updateCategoryById,
   deleteCategoryById,
 };

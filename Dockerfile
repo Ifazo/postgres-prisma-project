@@ -2,7 +2,7 @@
 FROM node:22
 
 # Install Redis and Supervisor
-RUN apt-get update && apt-get install -y redis-server supervisor && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y redis-server supervisor
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -11,16 +11,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (both prod and dev)
-RUN npm install --ignore-scripts
+RUN npm install
 
 # Copy the rest of the application files
 COPY . .
 
-# Copy the .env file
-COPY .env .env
-
 # Run Prisma migrations and generate client after install
-RUN npm run deploy && npm run generate
+RUN npm run prisma:deploy && npm run prisma:generate
 
 # Build TypeScript project (creates `dist/` folder)
 RUN npm run build

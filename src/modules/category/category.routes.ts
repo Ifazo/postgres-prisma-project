@@ -12,7 +12,7 @@ router
     categoryController.postCategory,
   )
   .get("/", categoryController.getCategories)
-  .get("/:id", categoryController.getProductsByCategory)
+  .get("/:id", categoryController.getCategoryById)
   .patch(
     "/:id",
     auth(Role.admin, Role.super_admin),

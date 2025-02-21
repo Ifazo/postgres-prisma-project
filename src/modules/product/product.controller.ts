@@ -23,10 +23,9 @@ const createProduct = async (req: Request, res: Response) => {
 
 const getProducts = async (req: Request, res: Response) => {
   try {
-    const { search, skip, take } = req.query;
-    const cacheKey = `products:${search || ""}:${skip || 0}:${take || 10}`;
+    const { search, categoryId, skip, take } = req.query;
+    const cacheKey = `products:${search}:${categoryId}:${skip}:${take}`;
     const cachedProducts = await redis.get(cacheKey);
-
     if (cachedProducts) {
       return res.status(200).send({
         success: true,
@@ -54,12 +53,21 @@ const getProducts = async (req: Request, res: Response) => {
           ],
         },
       });
-    } else if (skip && take) {
+    }
+    else if (categoryId) {
+      result = await prisma.product.findMany({
+        where: {
+          categoryId: categoryId as string,
+        },
+      });
+    }
+    else if (skip && take) {
       result = await prisma.product.findMany({
         skip: Number(skip) || 0,
         take: Number(take) || 10,
       });
-    } else {
+    }
+    else {
       result = await prisma.product.findMany({
         orderBy: {
           createdAt: "desc",
