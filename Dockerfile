@@ -16,11 +16,12 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
-# Copy the .env file
-COPY .env .env
+# Set environment variable
+ENV DATABASE_URL="postgresql://expressdb_owner:npg_iZkmzy2KXsr4@ep-misty-sound-a1n2iavn-pooler.ap-southeast-1.aws.neon.tech/expressdb?sslmode=require"
 
 # Run Prisma migrations and generate client after install
 RUN npm run prisma:deploy && npm run prisma:generate
+
 
 # Build TypeScript project (creates `dist/` folder)
 RUN npm run build
