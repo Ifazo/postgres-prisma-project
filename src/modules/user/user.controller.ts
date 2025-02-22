@@ -4,6 +4,8 @@ import { UserRole } from "@prisma/client";
 import { JwtPayload, Secret, verify } from "jsonwebtoken";
 import dotenv from "dotenv";
 import userSchema from "../../schema/user.schema";
+import sendResponse from "../../middlewares/sendResponse";
+import verifyToken from "../../middlewares/verifyToken";
 
 dotenv.config();
 
@@ -13,27 +15,16 @@ const getUsers = async (req: Request, res: Response) => {
   try {
     const { role } = req.query;
     if (!role) {
-      return res.status(400).send({
-        success: false,
-        message: "Role is required",
-      });
+      return sendResponse(res, 400, false, "Role not provided");
     }
     const result = await prisma.user.findMany({
       where: {
         role: role as UserRole,
       },
     });
-    return res.send({
-      success: true,
-      statusCode: 200,
-      message: "Users get successfully",
-      data: result,
-    });
+    return sendResponse(res, 200, true, "Users retrieved successfully", result);
   } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: error,
-    });
+    return sendResponse(res, 500, false, error);
   }
 };
 
@@ -42,39 +33,34 @@ const getUserById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized: No Bearer token provided.",
-      });
+      return sendResponse(
+        res,
+        401,
+        false,
+        "Unauthorized: No Bearer token provided."
+      );
     }
-    const token = authHeader.split(" ")[1];
-    const secret = process.env.JWT_SECRET_KEY as Secret;
-    const decodedToken = verify(token, secret) as JwtPayload;
+    const decodedToken = verifyToken(authHeader);
+    if (!decodedToken) {
+      return sendResponse(res, 401, false, "Unauthorized");
+    }
     if (decodedToken.id !== id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized: You are not allowed to access this resource.",
-      });
+      return sendResponse(
+        res,
+        401,
+        false,
+        "Unauthorized: You are not allowed to access this resource."
+      );
     }
     const result = await prisma.user.findUnique({
       where: { id },
     });
     if (!result) {
-      return res.status(404).send({
-        success: false,
-        message: "User not found",
-      });
+      return sendResponse(res, 404, false, "User not found");
     }
-    return res.status(200).send({
-      success: true,
-      message: "User get successfully",
-      data: result,
-    });
+    return sendResponse(res, 200, true, "User retrieved successfully", result);
   } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: error,
-    });
+    return sendResponse(res, 500, false, error);
   }
 };
 
@@ -83,42 +69,36 @@ const updateUserById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized: No Bearer token provided.",
-      });
+      return sendResponse(
+        res,
+        401,
+        false,
+        "Unauthorized: No Bearer token provided."
+      );
     }
-    const token = authHeader.split(" ")[1];
-    const secret = process.env.JWT_SECRET_KEY as Secret;
-    const decodedToken = verify(token, secret) as JwtPayload;
+    const decodedToken = verifyToken(authHeader);
+    if (!decodedToken) {
+      return sendResponse(res, 401, false, "Unauthorized");
+    }
     if (decodedToken.id !== id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized: You are not allowed to access this resource.",
-      });
+      return sendResponse(
+        res,
+        401,
+        false,
+        "Unauthorized: You are not allowed to access this resource."
+      );
     }
     const validationResult = userUpdateSchema.safeParse(req.body);
     if (!validationResult.success) {
-      return res.status(400).send({
-        success: false,
-        message: validationResult.error.errors,
-      });
+      return sendResponse(res, 400, false, validationResult.error.errors);
     }
     const result = await prisma.user.update({
       where: { id },
       data: validationResult.data,
     });
-    return res.send({
-      success: true,
-      statusCode: 200,
-      message: "User updated successfully",
-      data: result,
-    });
+    return sendResponse(res, 200, true, "User updated successfully", result);
   } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: error,
-    });
+    return sendResponse(res, 500, false, error);
   }
 };
 
@@ -127,33 +107,31 @@ const deleteUserById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized: No Bearer token provided.",
-      });
+      return sendResponse(
+        res,
+        401,
+        false,
+        "Unauthorized: No Bearer token provided."
+      );
     }
-    const token = authHeader.split(" ")[1];
-    const secret = process.env.JWT_SECRET_KEY as Secret;
-    const decodedToken = verify(token, secret) as JwtPayload;
+    const decodedToken = verifyToken(authHeader);
+    if (!decodedToken) {
+      return sendResponse(res, 401, false, "Unauthorized");
+    }
     if (decodedToken.id !== id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized: You are not allowed to access this resource.",
-      });
+      return sendResponse(
+        res,
+        401,
+        false,
+        "Unauthorized: You are not allowed to access this resource."
+      );
     }
     await prisma.user.delete({
       where: { id },
     });
-    return res.send({
-      success: true,
-      statusCode: 200,
-      message: "User deleted successfully",
-    });
+    return sendResponse(res, 200, true, "User deleted successfully");
   } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: error,
-    });
+    return sendResponse(res, 500, false, error);
   }
 };
 

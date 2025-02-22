@@ -4,6 +4,7 @@ import { prisma } from "../../app";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import userSchema from "../../schema/user.schema";
+import sendResponse from "../../middlewares/sendResponse";
 
 dotenv.config();
 
@@ -13,22 +14,13 @@ const signInUser = async (req: Request, res: Response) => {
     const user = await prisma.user.findUnique({
       where: { email },
     });
-
     if (!user) {
-      return res.status(400).send({
-        success: false,
-        message: "User not found!",
-      });
+      return sendResponse(res, 401, false, "Invalid credentials!");
     }
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).send({
-        success: false,
-        message: "Invalid credentials!",
-      });
+      return sendResponse(res, 401, false, "Invalid credentials!");
     }
-
     const payload = {
       id: user.id,
       name: user.name,
@@ -39,16 +31,9 @@ const signInUser = async (req: Request, res: Response) => {
     const token = sign(payload, secret, { expiresIn: "24h" });
     req.headers.authorization = token;
 
-    return res.status(200).send({
-      success: true,
-      message: "Sign in user successfully",
-      data: { token },
-    });
+    return sendResponse(res, 200, true, "Sign in successfully", { token });
   } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: error,
-    });
+    return sendResponse(res, 500, false, error);
   }
 };
 
@@ -56,35 +41,22 @@ const signUpUser = async (req: Request, res: Response) => {
   try {
     const validationResult = userSchema.safeParse(req.body);
     if (!validationResult.success) {
-      return res.status(400).send({
-        success: false,
-        message: validationResult.error.errors,
-      });
+      return sendResponse(res, 400, false, validationResult.error.errors);
     }
     const { email, password } = validationResult.data;
     const userExists = await prisma.user.findUnique({
       where: { email },
     });
     if (userExists) {
-      return res.status(400).send({
-        success: false,
-        message: "User already exists",
-      });
+      return sendResponse(res, 409, false, "User already exists");
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await prisma.user.create({
       data: { ...validationResult.data, password: hashedPassword },
     });
-    return res.status(201).send({
-      success: true,
-      message: "Sign up user successfully",
-      data: result,
-    });
+    return sendResponse(res, 201, true, "User created successfully", result);
   } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: error,
-    });
+    return sendResponse(res, 500, false, error);
   }
 };
 

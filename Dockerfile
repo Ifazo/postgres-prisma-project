@@ -16,6 +16,12 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
+# Copy the .env file
+COPY .env .env
+
+# Run Prisma migrations and generate client after install
+RUN npm run prisma:deploy && npm run prisma:generate
+
 # Build TypeScript project (creates `dist/` folder)
 RUN npm run build
 

@@ -1,20 +1,21 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import sendResponse from "../../middlewares/sendResponse";
+import verifyToken from "../../middlewares/verifyToken";
 
-const getOrders = async (req: Request, res: Response) => {
+const getOrders = async (_req: Request, res: Response) => {
   try {
     const orders = await prisma.order.findMany();
-    return res.status(200).send({
-      success: true,
-      message: "Orders get successfully",
-      data: orders,
-    });
+    return sendResponse(
+      res,
+      200,
+      true,
+      "Orders retrieved successfully",
+      orders
+    );
   } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: error,
-    });
+    return sendResponse(res, 500, false, error);
   }
 };
 
@@ -23,14 +24,12 @@ const getOrderById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized: No Bearer token provided.",
-      });
+      return sendResponse(res, 401, false, "Unauthorized");
     }
-    const token = authHeader.split(" ")[1];
-    const secret = process.env.JWT_SECRET_KEY as Secret;
-    const decodedToken = jwt.verify(token, secret) as JwtPayload;
+    const decodedToken = verifyToken(authHeader);
+    if (!decodedToken) {
+      return sendResponse(res, 401, false, "Unauthorized");
+    }
     const userId = decodedToken.id;
     const order = await prisma.order.findUnique({
       where: {
@@ -38,27 +37,14 @@ const getOrderById = async (req: Request, res: Response) => {
       },
     });
     if (!order) {
-      return res.status(404).send({
-        success: false,
-        message: "Order not found",
-      });
+      return sendResponse(res, 404, false, "Order not found");
     }
     if (order?.userId !== userId) {
-      return res.status(403).send({
-        success: false,
-        message: "You are not the owner of this order",
-      });
+      return sendResponse(res, 403, false, "Forbidden");
     }
-    return res.status(200).send({
-      success: true,
-      message: "Order get successfully",
-      data: order,
-    });
+    return sendResponse(res, 200, true, "Order retrieved successfully", order);
   } catch (error) {
-    return res.status(500).send({
-      success: false,
-      message: error,
-    });
+    return sendResponse(res, 500, false, error);
   }
 };
 
