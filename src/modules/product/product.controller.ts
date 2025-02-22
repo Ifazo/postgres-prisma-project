@@ -1,11 +1,21 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
 import { redis } from "../..";
+import productSchema from "../../schema/product.schema";
+
+const productUpdateSchema = productSchema.partial();
 
 const createProduct = async (req: Request, res: Response) => {
   try {
+    const validationResult = productSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).send({
+        success: false,
+        message: validationResult.error.errors,
+      });
+    }
     const result = await prisma.product.create({
-      data: req.body,
+      data: validationResult.data,
     });
     await redis.del("products");
     return res.status(201).send({
@@ -53,21 +63,18 @@ const getProducts = async (req: Request, res: Response) => {
           ],
         },
       });
-    }
-    else if (categoryId) {
+    } else if (categoryId) {
       result = await prisma.product.findMany({
         where: {
           categoryId: categoryId as string,
         },
       });
-    }
-    else if (skip && take) {
+    } else if (skip && take) {
       result = await prisma.product.findMany({
         skip: Number(skip) || 0,
         take: Number(take) || 10,
       });
-    }
-    else {
+    } else {
       result = await prisma.product.findMany({
         orderBy: {
           createdAt: "desc",
@@ -129,10 +136,16 @@ const getProductById = async (req: Request, res: Response) => {
 const updateProductById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const data = req.body;
+    const validationResult = productUpdateSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).send({
+        success: false,
+        message: validationResult.error.errors,
+      });
+    }
     const result = await prisma.product.update({
       where: { id },
-      data,
+      data: validationResult.data,
     });
     if (!result) {
       return res.status(404).send({

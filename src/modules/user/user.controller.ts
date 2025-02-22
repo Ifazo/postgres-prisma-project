@@ -3,8 +3,11 @@ import { prisma } from "../../app";
 import { UserRole } from "@prisma/client";
 import { JwtPayload, Secret, verify } from "jsonwebtoken";
 import dotenv from "dotenv";
+import userSchema from "../../schema/user.schema";
 
 dotenv.config();
+
+const userUpdateSchema = userSchema.partial();
 
 const getUsers = async (req: Request, res: Response) => {
   try {
@@ -47,7 +50,7 @@ const getUserById = async (req: Request, res: Response) => {
     const token = authHeader.split(" ")[1];
     const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = verify(token, secret) as JwtPayload;
-    if (decodedToken.role !== "admin" && decodedToken.id !== id) {
+    if (decodedToken.id !== id) {
       return res.status(401).json({
         success: false,
         message: "Unauthorized: You are not allowed to access this resource.",
@@ -62,9 +65,8 @@ const getUserById = async (req: Request, res: Response) => {
         message: "User not found",
       });
     }
-    return res.send({
+    return res.status(200).send({
       success: true,
-      statusCode: 200,
       message: "User get successfully",
       data: result,
     });
@@ -79,7 +81,6 @@ const getUserById = async (req: Request, res: Response) => {
 const updateUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const data = req.body;
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
@@ -90,15 +91,22 @@ const updateUserById = async (req: Request, res: Response) => {
     const token = authHeader.split(" ")[1];
     const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = verify(token, secret) as JwtPayload;
-    if (decodedToken.role !== "admin" && decodedToken.id !== id) {
+    if (decodedToken.id !== id) {
       return res.status(401).json({
         success: false,
         message: "Unauthorized: You are not allowed to access this resource.",
       });
     }
+    const validationResult = userUpdateSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).send({
+        success: false,
+        message: validationResult.error.errors,
+      });
+    }
     const result = await prisma.user.update({
       where: { id },
-      data,
+      data: validationResult.data,
     });
     return res.send({
       success: true,
@@ -112,7 +120,7 @@ const updateUserById = async (req: Request, res: Response) => {
       message: error,
     });
   }
-}
+};
 
 const deleteUserById = async (req: Request, res: Response) => {
   try {
@@ -127,7 +135,7 @@ const deleteUserById = async (req: Request, res: Response) => {
     const token = authHeader.split(" ")[1];
     const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = verify(token, secret) as JwtPayload;
-    if (decodedToken.role !== "admin" && decodedToken.id !== id) {
+    if (decodedToken.id !== id) {
       return res.status(401).json({
         success: false,
         message: "Unauthorized: You are not allowed to access this resource.",
@@ -147,7 +155,7 @@ const deleteUserById = async (req: Request, res: Response) => {
       message: error,
     });
   }
-}
+};
 
 export const userController = {
   getUsers,

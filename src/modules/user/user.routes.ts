@@ -7,8 +7,8 @@ const router = Router();
 
 router
   .get("/", auth(UserRole.admin), userController.getUsers)
-  .get("/:id", auth(UserRole.admin), userController.getUserById)
-  .patch("/:id", auth(UserRole.admin), userController.updateUserById)
+  .get("/:id", userController.getUserById)
+  .patch("/:id", userController.updateUserById)
   .delete("/:id", userController.deleteUserById);
 
 export const userRoutes = router;

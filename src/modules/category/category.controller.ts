@@ -1,10 +1,21 @@
 import { Request, Response } from "express";
 import { prisma } from "../../app";
 import { redis } from "../..";
+import categorySchema from "../../schema/category.schema";
+
+const categoryUpdateSchema = categorySchema.partial();
 
 const postCategory = async (req: Request, res: Response) => {
   try {
-    const { name } = req.body;
+    const validationResult = categorySchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).send({
+        success: false,
+        message: validationResult.error.errors,
+      });
+    }
+
+    const { name } = validationResult.data;
     const categoryExists = await prisma.category.findUnique({
       where: { name },
     });
@@ -15,7 +26,7 @@ const postCategory = async (req: Request, res: Response) => {
       });
     }
     const result = await prisma.category.create({
-      data: req.body,
+      data: validationResult.data,
     });
     await redis.del("categories");
     return res.status(201).send({
@@ -86,8 +97,7 @@ const getCategoryById = async (req: Request, res: Response) => {
       message: "Category get successfully",
       data: result,
     });
-  }
-  catch (error) {
+  } catch (error) {
     return res.status(500).send({
       success: false,
       message: error,
@@ -98,9 +108,16 @@ const getCategoryById = async (req: Request, res: Response) => {
 const updateCategoryById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const validationResult = categoryUpdateSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).send({
+        success: false,
+        message: validationResult.error.errors,
+      });
+    }
     const result = await prisma.category.update({
       where: { id },
-      data: req.body,
+      data: validationResult.data,
     });
     if (!result) {
       return res.status(404).send({

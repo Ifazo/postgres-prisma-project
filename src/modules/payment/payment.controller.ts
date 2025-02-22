@@ -15,7 +15,7 @@ interface ProductQuantity extends Product {
 
 const createPayment = async (req: Request, res: Response) => {
   try {
-    const products: ProductQuantity[] = req.body;
+    const { products }: { products: ProductQuantity[] } = req.body;
     if (!products || products.length === 0) {
       return res.status(400).send({
         success: false,
@@ -33,9 +33,18 @@ const createPayment = async (req: Request, res: Response) => {
     const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
     const { name, email } = decodedToken;
+    const userExists = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (!userExists) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
     const customer = await stripe.customers.create({
       name,
-      email
+      email,
     });
     const items = products.map((product: ProductQuantity) => ({
       price_data: {
@@ -64,16 +73,20 @@ const createPayment = async (req: Request, res: Response) => {
     }
     const order = await prisma.order.create({
       data: {
-        products: products.map(product => ({
+        products: products.map((product) => ({
           ...product,
-          quantity: product.quantity
+          quantity: product.quantity,
         })),
         userName: name,
         userEmail: email,
-        total: products.reduce((acc: number, product: ProductQuantity) => acc + product.price * product.quantity, 0),
+        total: products.reduce(
+          (acc: number, product: ProductQuantity) =>
+            acc + product.price * product.quantity,
+          0
+        ),
         sessionId: session.id,
         status: "pending",
-      }
+      },
     });
     return res.status(201).send({
       success: true,

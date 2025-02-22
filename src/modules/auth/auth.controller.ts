@@ -3,6 +3,7 @@ import { JwtPayload, Secret, sign, verify } from "jsonwebtoken";
 import { prisma } from "../../app";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import userSchema from "../../schema/user.schema";
 
 dotenv.config();
 
@@ -53,28 +54,31 @@ const signInUser = async (req: Request, res: Response) => {
 
 const signUpUser = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const validationResult = userSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).send({
+        success: false,
+        message: validationResult.error.errors,
+      });
+    }
+    const { email, password } = validationResult.data;
     const userExists = await prisma.user.findUnique({
       where: { email },
     });
-
     if (userExists) {
       return res.status(400).send({
         success: false,
         message: "User already exists",
       });
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: { ...req.body, password: hashedPassword },
+    const result = await prisma.user.create({
+      data: { ...validationResult.data, password: hashedPassword },
     });
-
-    return res.status(200).send({
+    return res.status(201).send({
       success: true,
       message: "Sign up user successfully",
-      data: { user },
+      data: result,
     });
   } catch (error) {
     return res.status(500).send({

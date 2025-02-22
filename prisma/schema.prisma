@@ -22,28 +22,32 @@ enum OrderStatus {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String?
-  image     String?
-  email     String   @unique
-  password  String
-  role      UserRole @default(buyer)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-  reviews   Review[]
-  orders    Order[]
+  id       String   @id @default(uuid())
+  name     String?
+  image    String?
+  email    String   @unique
+  password String
+  role     UserRole @default(buyer)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  reviews Review[]
+  orders  Order[]
 
   @@map("users")
 }
 
 model Category {
-  id          String    @id @default(uuid())
-  name        String    @unique
+  id          String @id @default(uuid())
+  name        String @unique
   image       String
   description String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  products    Product[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  products Product[]
 
   @@map("categories")
 }
@@ -56,25 +60,27 @@ model Product {
   price       Float
   rating      Float
   stock       Int
-  categoryId  String   @map("catagoery_id")
+  categoryId  String   @map("category_id")
   category    Category @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  reviews     Review[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  reviews   Review[]
 
   @@map("products")
 }
 
 model Review {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   rating    Float
   review    String
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  productId String   @map("product_id")
-  product   Product  @relation(fields: [productId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    String  @map("user_id")
+  user      User    @relation(fields: [userId], references: [id])
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("reviews")
 }
@@ -88,6 +94,9 @@ model Order {
   total     Float
   sessionId String      @map("session_id")
   status    OrderStatus @default(pending)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("orders")
 }
