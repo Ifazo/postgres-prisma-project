@@ -172,7 +172,6 @@ const updateReview = async (req: Request, res: Response) => {
         message: "You are not the owner of this review",
       });
     }
-
     const result = await prisma.review.update({
       where: {
         id,
@@ -215,7 +214,6 @@ const deleteReview = async (req: Request, res: Response) => {
     const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
     const userId = decodedToken.id;
-
     const review = await prisma.review.findUnique({
       where: {
         id,
@@ -227,7 +225,6 @@ const deleteReview = async (req: Request, res: Response) => {
         message: "You are not the owner of this review",
       });
     }
-
     const result = await prisma.review.delete({
       where: {
         id,

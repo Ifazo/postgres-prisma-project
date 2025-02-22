@@ -32,7 +32,7 @@ const createPayment = async (req: Request, res: Response) => {
     const token = authHeader.split(" ")[1];
     const secret = process.env.JWT_SECRET_KEY as Secret;
     const decodedToken = jwt.verify(token, secret) as JwtPayload;
-    const { name, email } = decodedToken;
+    const { id, name, email } = decodedToken;
     const userExists = await prisma.user.findUnique({
       where: { email },
     });
@@ -71,14 +71,13 @@ const createPayment = async (req: Request, res: Response) => {
         message: "Failed to create payment session.",
       });
     }
-    const order = await prisma.order.create({
+    const result = await prisma.order.create({
       data: {
         products: products.map((product) => ({
           ...product,
           quantity: product.quantity,
         })),
-        userName: name,
-        userEmail: email,
+        userId: id,
         total: products.reduce(
           (acc: number, product: ProductQuantity) =>
             acc + product.price * product.quantity,
@@ -91,10 +90,7 @@ const createPayment = async (req: Request, res: Response) => {
     return res.status(201).send({
       success: true,
       message: "Payment session created successfully.",
-      userName: name,
-      userEmail: email,
-      sessionId: session.id,
-      orderId: order.id,
+      data: result,
     });
   } catch (error) {
     return res.status(500).send({

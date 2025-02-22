@@ -87,11 +87,10 @@ model Review {
 
 model Order {
   id        String      @id @default(uuid())
-  userName  String?     @map("user_name")
-  userEmail String      @map("user_email")
-  user      User        @relation(fields: [userEmail], references: [email])
   products  Json[]
   total     Float
+  userId    String      @map("user_id")
+  user      User        @relation(fields: [userId], references: [id])
   sessionId String      @map("session_id")
   status    OrderStatus @default(pending)
 
