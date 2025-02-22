@@ -16,17 +16,14 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
-# Run Prisma migrations and generate client after install
-RUN npm run prisma:deploy && npm run prisma:generate
-
 # Build TypeScript project (creates `dist/` folder)
 RUN npm run build
 
 # Copy Supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Expose the port
+# Expose the ports
 EXPOSE 8000 6379
 
-# Start both Redis and the Node.js app using Supervisor
+# Start all services using Supervisor
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
